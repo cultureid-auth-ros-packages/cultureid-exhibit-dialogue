@@ -1,0 +1,14 @@
+# specific variables---to be prefixed and suffixed at runtime
+tl_variables: [
+  ['dir_media',           '/gui_resources/media_']
+]
+
+# specific .yaml files---to be prefixed and suffixed at runtime
+tl_files: [
+  '/config/params_',
+]
+
+# common directories with files
+tl_common_files: [
+  ['dir_scripts',             '/gui_resources/scripts']
+]

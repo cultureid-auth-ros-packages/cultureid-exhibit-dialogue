@@ -1,0 +1,27 @@
+<launch>
+
+  <!-- The name of this package -->
+  <arg name="pkg_name" default="cultureid_exhibit_dialogue" />
+
+  <!-- The absolute path of this package -->
+  <arg name="pkg_ap"   default="$(eval find(arg ('pkg_name')))" />
+
+
+  <node name="cultureid_exhibit_dialogue_gui_node" pkg="cultureid_exhibit_dialogue" type="main.py" output="screen">
+
+    <param name="pkg_name"              value="$(arg pkg_name)" />
+    <param name="pkg_ap"                value="$(arg pkg_ap)" />
+    <param name="navigation_warnfile"   value="$(arg pkg_ap)/gui_resources/navigation/move_bitch.mp3" />
+    <param name="navigation_audiofile"  value="$(arg pkg_ap)/gui_resources/navigation/p1_to_p2.mp3" />
+    <param name="navigation_imagefile"  value="$(arg pkg_ap)/gui_resources/navigation/danger.png" />
+    <param name="listening_imagefile"   value="$(arg pkg_ap)/gui_resources/interaction/robot_listening.png" />
+    <param name="speaking_imagefile"    value="$(arg pkg_ap)/gui_resources/interaction/robot_speaking.png" />
+    <rosparam command="load"            file="$(arg pkg_ap)/config/exhibits.yaml" />
+    <rosparam command="load"            file="$(arg pkg_ap)/config/to_load.yaml" />
+
+  </node>
+
+
+  <node name="cultureid_exhibit_dialogue_s2s_node" pkg="cultureid_exhibit_dialogue" type="send_node.py" output="screen" />
+
+</launch>

@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "solid-scope-361216",
+  "private_key_id": "f63934ecc11d89ac9be1407ab92266c62ddf1017",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDzmDjDP11d/466\ncW+FqNb0xq93+u+p6itnpBc81QBuESQ0DYX5DTJlzQABKQKf1ZabVFD61agLapax\n2kePY2qlknCXNzj3Wg2oFTTinjoXqejz8KQFzJLA2+B8+yUX5rtICve/8hfjOP7W\npSCUZvQeMhxSUwBnGm/8TISmG5kByP+1NLnEksIe+F+XToWLY9IWB7ALxA4inY4v\nP4BJ+P1FP4IZewHIXUjA7AUUvQDd75jGMgBoI3SuHjMiaGkZwfZhmocq9bSCpuvY\nheiTYbhGBmjkpib5VVA49FhhYeKXWpEZhHsJtXGHaxkq0EKlnq/8EaE5IPPoyvkU\n2frtxGw3AgMBAAECggEADPTCNefa7ioD7BwmjWbCJeJqU1by0nLPTk5hXAaMAUB0\ns/4Nsr7pxwdaN4rp6acviBo6A0q1w8qSB9wvT9oF3tAFEj+s1V8iMV8NKFEqAX7B\n2YrF/a/b+Fl19iNZQRt3R5O3+8dm3b4v7Ju0Vkr9FtXWQQPKz01/1sBu57orRJP9\nnygFDw8EU3kt8GxsiSYfGDUrDx1l5YKQ2EGKgoHFlInBA3E4gSbidKHsR0cEGJIc\njVYMWrzXM24p52sxm/2fw7teyHdHeTL++yPjlClBfUnz8hybRZhwTWMphhJrMP0b\nTHw0iGArbJ/5K3Po+AgekC2DzBs74llzSp8jHZssvQKBgQD8ZIFCZb+pR9LWUW69\nqpqvModZ5pDZ+jV7Y/7kBmf7d3ebvOHo7ziU/jg30s0VOVbHWunhaWmEYDqf0gDU\n1IFcPULPr2+PFkEsqJTKkuHe/DU/mzxprrTkXCzAzMAzKROQYY7Om9jwAOWFHkM2\nmLNRRwQVF9vF7Ykx5Tm3cJfXVQKBgQD3E4Z7ue/H28wt87GlROJmICQzHfDGMl5x\nVeyY4c5blK7xI6aT4cCf93BZ931jWx94R7QnNjnw7+rDuyiEw8KfE8eVtgU7Bnc0\naW2kqLo4a+5j9V3WincfHZdVr33DyxphuJ7PahnWQaYAfgOB4YQ/8QusHx8tjAQZ\nvPzTEk1dWwKBgGs0UYcfatp/bHmmGzCqz4tNHhq8iZhc4+ymW7UFV5ODeiWHhDmJ\nqvH2TXDAtGWodki1QBSDztLwgNYzwDCmls/UIZXPwcX4QPS0Iocs/o3VeNSsnmuR\nTrqUwFmgXp8cenfgSGVP40SGTPdPFGOTVs9WJ9DB0pLuw1CTOgHF7GkFAoGBALIs\n3XWKD9WjtumIbJpPQ6j8Er7eH4z+M8ctfJJ/fE3kugfherX4Pe3eBaKLbFvjEZ2u\nr8b7Put2SGlgJYcgmNAY9nwLKFh5gCtGwC/XEXuwsdhZ0JLvhZnlwAWlqV8xr1O7\nTKMs03cEHo8KUMMv+ywVSyKTyusQpsBc3kHkV/AzAoGBAKp8p9X1bcyxuEL+Eart\n5Y/fbXd6GhriwPmzbenY7Eo9vEE5o0exgnOmPEVecQTMAw1yPlrMT6hIcY05r2XI\nJbtfrdUg7OYz2ZnEfkYWUyph/XnVIMiX4736Qj6meYOct12HrwUAiwJsLeCA49rv\n1IcBBB8+RISTh/LMj6Bbr00b\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-acount-museum@solid-scope-361216.iam.gserviceaccount.com",
+  "client_id": "101714553544547527676",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-acount-museum%40solid-scope-361216.iam.gserviceaccount.com"
+}

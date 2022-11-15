@@ -1,0 +1,6 @@
+# Starting pose for exhibit b
+# amth
+#start_pose: [5.64967856723, 18.9799411493, 0,0,0, -0.760383454837, 0.649474404123]
+
+# amth_offices_wunknown for testing (museum is crowded)
+start_pose: [7.13205432033, 10.5253486524, 0,0,0, 0.315150221271, 0.94904179994]
