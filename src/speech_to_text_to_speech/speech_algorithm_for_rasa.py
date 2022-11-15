@@ -147,7 +147,7 @@ class MicrophoneStream(object):
 
 
 #-------------------------------------------------------------------------------
-def listen_print_loop(responses,stream):
+def listen_print_loop(responses,stream,transcript_write_file):
 
 
     num_chars_printed = 0
@@ -189,6 +189,9 @@ def listen_print_loop(responses,stream):
 
         transcript = alternative.transcript
 
+        # Write transcript to file
+        write_file(transcript, transcript_write_file)
+
         if DEBUG:
             print('THIS IS THE TRANSCRIPT')
             print(transcript)
@@ -214,7 +217,7 @@ def listen_print_loop(responses,stream):
 
 
 #-------------------------------------------------------------------------------
-def speech_to_text():
+def speech_to_text(transcript_write_file):
 
     # Audio recording parameters
     rate = RESPEAKER_RATE
@@ -248,6 +251,7 @@ def speech_to_text():
 
             if DEBUG:
                 print("new stream")
+
             start_stream = time.time()
             audio_generator = stream.generator()
 
@@ -258,7 +262,7 @@ def speech_to_text():
 
             responses = client.streaming_recognize(streaming_config, requests)
 
-            transcript, confidence = listen_print_loop(responses,stream)
+            transcript, confidence = listen_print_loop(responses,stream,transcript_write_file)
 
             if stream.time_over:
 
@@ -370,3 +374,15 @@ def text_to_speech(text):
     )
 
     pa_stream.write(response.audio_content)
+
+
+##############################################################################
+def write_file(content, file_str):
+  with open(file_str,'w') as f:
+    f.write(content)
+    f.close()
+
+##############################################################################
+def reset_file(file_str):
+  with open(file_str,'w') as f:
+    f.close()
