@@ -23,9 +23,6 @@ class S2S():
     # Write each transcript into a single file
     self.transcript_file_ = transcript_file
 
-    # When starting-up reset the transcript file
-    self.reset_file(self.transcript_file_)
-
     # This is the meat
     self.talk_to_bot_via_rest()
 
@@ -51,7 +48,7 @@ class S2S():
 
         #print('ROBOT')
         #print(self.robot_speech_text_)
-        self.write_file(self.robot_speech_text_, self.transcript_file_)
+        self.write_file('[ROBOT] ' + self.robot_speech_text_, self.transcript_file_)
 
         # Speak text
         text_to_speech(self.robot_speech_text_)

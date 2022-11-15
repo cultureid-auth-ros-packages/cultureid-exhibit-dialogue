@@ -104,13 +104,15 @@ class MicrophoneStream(object):
             self._audio_stream.start_stream()
 
             if (i > int(self._rate / self._chunk * self.duration)-1) and (not self.has_input):
-                print("telos xronou kai adeio")
+                if DEBUG:
+                    print("telos xronou kai adeio")
                 break
 
             current_time = time.time()
             diff_time = current_time-self.start_input
             if diff_time > self.duration*3:
-                print("10 deuterolepta")
+                if DEBUG:
+                    print("10 deuterolepta")
                 self.time_over = True
                 break
 
@@ -190,7 +192,7 @@ def listen_print_loop(responses,stream,transcript_write_file):
         transcript = alternative.transcript
 
         # Write transcript to file
-        write_file(transcript, transcript_write_file)
+        write_file('[HUMAN] ' + transcript, transcript_write_file)
 
         if DEBUG:
             print('THIS IS THE TRANSCRIPT')
@@ -205,7 +207,9 @@ def listen_print_loop(responses,stream,transcript_write_file):
             sys.stdout.flush()
             num_chars_printed = len(transcript)
         else:
-            print(transcript + overwrite_chars)
+            if DEBUG:
+                print(transcript + overwrite_chars)
+
             num_chars_printed = 0
             return transcript, confidence
 
@@ -245,8 +249,9 @@ def speech_to_text(transcript_write_file):
 
     while True:
 
-        print("--"*50)
-        print("--"*50)
+        if DEBUG:
+            print("--"*50)
+            print("--"*50)
         with MicrophoneStream(rate, chunk, duration) as stream:
 
             if DEBUG:

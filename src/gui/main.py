@@ -33,8 +33,6 @@ import roslib
 roslib.load_manifest("rosparam")
 import rosparam
 
-import one_exhibit
-
 
 
 class ExhibitDialogue():
@@ -59,8 +57,15 @@ class ExhibitDialogue():
     # Load params for this class
     self.init_params()
 
+    # Read transcript file every `read_rate` seconds
+    tf_read_rate = rospy.Duration(1.0 / self.transcript_file_readrate)
+    rospy.Timer(tf_read_rate, self.read_transcript_file)
+
+    # When starting-up reset the transcript file
+    self.reset_file(self.transcript_file_path)
+
     # Let's go
-    self.press_start()
+    self.main_screen()
 
     # DJ...SPIN THAT SHIT
     self.root.mainloop()
@@ -113,6 +118,57 @@ class ExhibitDialogue():
         buttonVec[counter].update()
 
         counter = counter+1
+
+
+  ##############################################################################
+  # exit button
+  def exit_button(self,frame):
+
+    buttonVec = []
+    buttonText = []
+
+    this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='red',activeforeground='#E0B548',activebackground='#343A40', command=self.kill_root)
+
+    buttonVec.append(this_butt)
+    this_group_name = 'X'
+    buttonText.append(this_group_name)
+
+    xNum = 1
+    yNum = 1
+
+    xEff = 0.075
+    yEff = 0.075
+
+    GP = 0.175
+
+    xWithGuard = xEff/xNum
+    xG = GP*xWithGuard
+    xB = xWithGuard-xG
+
+    yWithGuard = yEff/yNum
+    yG = GP*yWithGuard
+    yB = yWithGuard-yG
+
+    counter = len(buttonVec)-1
+    for xx in range(xNum):
+      for yy in range(yNum):
+
+        if counter < len(buttonVec):
+          thisX = xG/2+xx*xWithGuard+1-xEff
+          thisY = yG/2+yy*yWithGuard
+
+          buttonVec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
+          buttonVec[counter].config(text=buttonText[counter])
+          buttonVec[counter].update()
+
+          thisWidth = buttonVec[counter].winfo_width()
+          thisHeight = buttonVec[counter].winfo_height()
+          buttonVec[counter].config(font=("Helvetica", 20))
+          buttonVec[counter].update()
+
+        counter = counter+1
+
+    return frame
 
 
   ##############################################################################
@@ -184,6 +240,8 @@ class ExhibitDialogue():
     self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
     self.navigation_audiofile = rospy.get_param('~navigation_audiofile', '')
     self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
+    self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
+    self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
 
 
     if self.pkg_name == '':
@@ -222,6 +280,22 @@ class ExhibitDialogue():
       rospy.logerr('[%s] navigation_imagefile not set; aborting', self.pkg_name)
       return
 
+    if self.transcript_file_path == '':
+      rospy.logerr('[%s] transcript_file_path not set; aborting', self.pkg_name)
+      return
+
+    if self.transcript_file_readrate == '':
+      rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
+      return
+
+    # init transcript
+    self.transcript_ = ''
+
+    # The main screen's buttons and their text
+    self.q_button_vec = []
+    self.q_button_txt = []
+    self.a_button_vec = []
+    self.a_button_txt = []
 
     # Which exhibits have been viewed, in order.
     self.exhibit_codes_played = []
@@ -287,12 +361,12 @@ class ExhibitDialogue():
         self.goto_goal_pose()
 
     # Play this specific exhibit. This function blocks.
-    oe = one_exhibit.OneExhibit()
+    #oe = one_exhibit.OneExhibit()
 
     rospy.logerr('[%s] Dialogue over exhibit %s over', self.pkg_name, self.exhibit_codes[q])
 
     # This game is over. Would you care to get to know another one?
-    self.press_start()
+    #self.main_screen()
 
 
   ##############################################################################
@@ -350,6 +424,105 @@ class ExhibitDialogue():
         rosparam.load_file(file_path,default_namespace=myns)
     for params, ns in paramlist:
       rosparam.upload_params(ns,params)
+
+
+  ##############################################################################
+  def main_screen(self):
+
+    # new canvas
+    canvas = self.new_canvas()
+    self.set_canvas(canvas)
+
+    # to frame panw sto opoio 8a einai ta koumpia
+    frame = self.new_frame()
+    self.set_frame(frame)
+    frame = self.exit_button(frame)
+
+    # All the choices for this question
+    #choices = self.exhibit_titles
+
+
+    # Show Q -------------------------------------------------------------------
+    QButton = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548')
+    self.q_button_vec.append(QButton)
+
+    # The text of the question
+    self.q_button_txt.append(self.transcript_)
+
+    xNum = len(self.q_button_vec)
+    yNum = 1
+
+
+    xEff = 1.0
+    yEff = 0.7
+    GP = 0.1
+
+    xWithGuard = xEff/xNum
+    xG = GP*xWithGuard
+    xB = xWithGuard-xG
+
+    yWithGuard = yEff/yNum
+    yG = GP*yWithGuard
+    yB = yWithGuard-yG
+
+    counter = 0
+    for xx in range(xNum):
+      for yy in range(yNum):
+        thisX = xG/2+xx*xWithGuard
+        thisY = yG/2+yy*yWithGuard+0.1
+
+        self.q_button_vec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
+        self.q_button_vec[counter].config(text=self.q_button_txt[counter])
+        self.q_button_vec[counter].update()
+
+        thisWidth = self.q_button_vec[counter].winfo_width()
+        thisHeight = self.q_button_vec[counter].winfo_height()
+
+        self.q_button_vec[counter].config(font=("Helvetica", 16))
+        self.q_button_vec[counter].update()
+
+        counter = counter+1
+
+
+
+
+    # Show A -------------------------------------------------------------------
+    self.a_button_txt.append(self.transcript_)
+    this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40')
+    self.a_button_vec.append(this_butt)
+
+    xNum,yNum = self.get_x_y_dims(len(self.a_button_vec))
+
+    xEff = 1.0
+    yEff = 0.2
+    GP = 0.1
+
+    xWithGuard = xEff/xNum
+    xG = GP*xWithGuard
+    xB = xWithGuard-xG
+
+    yWithGuard = yEff/yNum
+    yG = GP*yWithGuard
+    yB = yWithGuard-yG
+
+    counter = 0
+    for xx in range(xNum):
+      for yy in range(yNum):
+
+        if counter < len(self.a_button_vec):
+          thisX = xG/2+xx*xWithGuard
+          thisY = yG/2+yy*yWithGuard+1-yEff
+
+          self.a_button_vec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
+          self.a_button_vec[counter].config(text=self.a_button_txt[counter])
+          self.a_button_vec[counter].update()
+
+          thisWidth = self.a_button_vec[counter].winfo_width()
+          thisHeight = self.a_button_vec[counter].winfo_height()
+          self.a_button_vec[counter].config(font=("Helvetica", 24))
+          self.a_button_vec[counter].update()
+
+        counter = counter+1
 
 
   ##############################################################################
@@ -456,113 +629,50 @@ class ExhibitDialogue():
 
 
   ##############################################################################
-  def press_start(self):
+  def read_transcript_file(self, event=None):
 
-    # new canvas
-    canvas = self.new_canvas()
-    self.set_canvas(canvas)
+    with open(self.transcript_file_path,'r') as f:
+      lines  = f.readlines()
+      f.close()
 
-    # to frame panw sto opoio 8a einai ta koumpia
-    frame = self.new_frame()
-    self.set_frame(frame)
+    self.transcript_ = ''.join(lines)
 
-    # All the choices for this question
-    choices = self.exhibit_titles
+    robot_talking = self.transcript_.find('[ROBOT]')
+    human_talking = self.transcript_.find('[HUMAN]')
 
-    # Show Q
-    buttonVec = []
-    buttonText = []
+    # Both should be -1 if they are equal. There is no text to process
+    if robot_talking == human_talking:
+      return
 
-    QButton = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40', command=self.kill_root)
-    buttonVec.append(QButton)
+    fg_color = ''
+    if robot_talking != -1:
+      self.transcript_ = self.transcript_[len('[ROBOT]')+1:]
+      fg_color = '#E0B548'
+    if human_talking != -1:
+      self.transcript_ = self.transcript_[len('[HUMAN]')+1:]
+      fg_color = '#FFFFFF'
 
-    # The text of the question
-    q_text = 'ΠΑΡΑΚΑΛΩ ΕΠΙΛΕΞΑΤΕ ΕΚΘΕΜΑ'
-    buttonText.append(q_text)
+    self.a_button_txt[0] = self.transcript_
+    self.a_button_vec[0].config(text=self.a_button_txt[0])
+    self.a_button_vec[0].config(fg=fg_color)
 
-    xNum = len(buttonVec)
-    yNum = 1
+    if robot_talking != -1:
+      self.a_button_vec[0].config(font=("Helvetica", 24))
+    if human_talking != -1:
+      self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
 
+    # Wrap transcript text
+    self.a_button_vec[0].config(\
+        wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
 
-    xEff = 1.0
-    yEff = 0.3
-    GP = 0.1
-
-    xWithGuard = xEff/xNum
-    xG = GP*xWithGuard
-    xB = xWithGuard-xG
-
-    yWithGuard = yEff/yNum
-    yG = GP*yWithGuard
-    yB = yWithGuard-yG
-
-    counter = 0
-    for xx in range(xNum):
-      for yy in range(yNum):
-        thisX = xG/2+xx*xWithGuard
-        thisY = yG/2+yy*yWithGuard+0.1
-
-        buttonVec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
-        buttonVec[counter].config(text=buttonText[counter])
-        buttonVec[counter].update()
-
-        thisWidth = buttonVec[counter].winfo_width()
-        thisHeight = buttonVec[counter].winfo_height()
-
-        buttonVec[counter].config(font=("Helvetica", 16))
-        buttonVec[counter].update()
-
-        counter = counter+1
+    # Set new configuration
+    self.a_button_vec[0].update()
 
 
-
-
-
-    # ta koumpia tou para8urou apanthseis
-    buttonVec = []
-    buttonText = []
-
-
-
-    # Show A
-    for i in range(len(choices)):
-      buttonText.append(choices[i])
-      this_butt = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548',command=partial(self.let_the_games_begin, i))
-      buttonVec.append(this_butt)
-
-    xNum,yNum = self.get_x_y_dims(len(buttonVec))
-
-    xEff = 1.0
-    yEff = 0.5
-    GP = 0.1
-
-    xWithGuard = xEff/xNum
-    xG = GP*xWithGuard
-    xB = xWithGuard-xG
-
-    yWithGuard = yEff/yNum
-    yG = GP*yWithGuard
-    yB = yWithGuard-yG
-
-    counter = 0
-    for xx in range(xNum):
-      for yy in range(yNum):
-
-        if counter < len(buttonVec):
-          thisX = xG/2+xx*xWithGuard
-          thisY = yG/2+yy*yWithGuard+1-yEff
-
-          buttonVec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
-          buttonVec[counter].config(text=buttonText[counter])
-          buttonVec[counter].update()
-
-          thisWidth = buttonVec[counter].winfo_width()
-          thisHeight = buttonVec[counter].winfo_height()
-          buttonVec[counter].config(font=("Helvetica", 20))
-          buttonVec[counter].update()
-
-        counter = counter+1
-
+  ##############################################################################
+  def reset_file(self, file_str):
+    with open(file_str,'w') as f:
+      f.close()
 
 
   ##############################################################################
