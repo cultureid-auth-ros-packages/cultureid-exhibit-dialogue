@@ -9,6 +9,7 @@ import time
 from subprocess import call, Popen
 from functools import partial
 import random
+import hashlib
 import Tkinter
 import tkFont
 from PIL import Image,ImageTk
@@ -33,8 +34,31 @@ import roslib
 roslib.load_manifest("rosparam")
 import rosparam
 
+################################################################################
+class pair(object):
+
+  def __init__(self,first,second):
+    self.set(first,second)
+
+  def set(self,first,second):
+    self.first = first
+    self.second = second
+
+  def update(self,first):
+    self.second = self.first
+    self.first = first
+
+  def equality(self):
+    return self.first == self.second
+
+  def printf(self):
+    print('-----------')
+    print(self.first)
+    print(self.second)
+    print('-----------')
 
 
+################################################################################
 class ExhibitDialogue():
 
   ##############################################################################
@@ -288,14 +312,26 @@ class ExhibitDialogue():
       rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
       return
 
+    self.R = '[ROBOT]'
+    self.H = '[HUMAN]'
+
     # init transcript
     self.transcript_ = ''
+
+    # A lock on the `read_transcript_file` function
+    self.rtf_lock = False
 
     # The main screen's buttons and their text
     self.q_button_vec = []
     self.q_button_txt = []
     self.a_button_vec = []
     self.a_button_txt = []
+
+    # Talking Sequence Pair: [0] for current talker, [1] for previous
+    self.tsp = pair(None,None)
+
+    # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
+    self.ssp = pair(0,0)
 
     # Which exhibits have been viewed, in order.
     self.exhibit_codes_played = []
@@ -520,6 +556,7 @@ class ExhibitDialogue():
           thisWidth = self.a_button_vec[counter].winfo_width()
           thisHeight = self.a_button_vec[counter].winfo_height()
           self.a_button_vec[counter].config(font=("Helvetica", 24))
+          self.a_button_vec[counter].config(wraplength=thisWidth-10,justify="center")
           self.a_button_vec[counter].update()
 
         counter = counter+1
@@ -629,44 +666,84 @@ class ExhibitDialogue():
 
 
   ##############################################################################
+  # Every time the transcript is read two things have to be determined:
+  # (a) Did the transcript change? (if not do not update the subtitle)
+  # (b) Did the author change?     (if not do not update the surtitle
+  #                                                   or the subtitle)
   def read_transcript_file(self, event=None):
 
-    with open(self.transcript_file_path,'r') as f:
-      lines  = f.readlines()
-      f.close()
-
-    self.transcript_ = ''.join(lines)
-
-    robot_talking = self.transcript_.find('[ROBOT]')
-    human_talking = self.transcript_.find('[HUMAN]')
-
-    # Both should be -1 if they are equal. There is no text to process
-    if robot_talking == human_talking:
+    # Do nothing if current function is currently being executed
+    # (timer read may be arbitrarily large)
+    if self.rtf_lock == False :
+      self.rtf_lock == True
+    else:
       return
 
-    fg_color = ''
-    if robot_talking != -1:
-      self.transcript_ = self.transcript_[len('[ROBOT]')+1:]
-      fg_color = '#E0B548'
-    if human_talking != -1:
-      self.transcript_ = self.transcript_[len('[HUMAN]')+1:]
-      fg_color = '#FFFFFF'
 
-    self.a_button_txt[0] = self.transcript_
-    self.a_button_vec[0].config(text=self.a_button_txt[0])
-    self.a_button_vec[0].config(fg=fg_color)
+    # Read content of transcript file
+    with open(self.transcript_file_path,'r') as f:
+      lines = f.readlines()
+    self.transcript_ = ''.join(lines)
 
-    if robot_talking != -1:
-      self.a_button_vec[0].config(font=("Helvetica", 24))
-    if human_talking != -1:
-      self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
+    # Update hash value of transcript
+    self.ssp.update(self.sha256sum(self.transcript_))
 
-    # Wrap transcript text
-    self.a_button_vec[0].config(\
-        wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
+    # Determine who's talking
+    robot_talking = self.transcript_.find(self.R) != -1
+    human_talking = self.transcript_.find(self.H) != -1
 
-    # Set new configuration
-    self.a_button_vec[0].update()
+    # No one is talking
+    if robot_talking == human_talking:
+      rospy.logwarn('[%s] No speech whatsoever from any side', self.pkg_name)
+      return
+
+    # Queue current talker
+    if robot_talking:
+      self.tsp.update(self.R)
+    elif human_talking:
+      self.tsp.update(self.H)
+
+
+    # Detect if talker or transcript changed since last call:
+    # screen modifications occur only during these events
+    talker_changed = not self.tsp.equality()
+    transc_changed = not self.ssp.equality()
+
+
+    # The transcript has changed
+    if transc_changed:
+      if robot_talking:
+        self.transcript_ = self.transcript_[len(self.R)+1:]
+      if human_talking:
+        self.transcript_ = self.transcript_[len(self.H)+1:]
+
+      self.a_button_txt[0] = self.transcript_
+      self.a_button_vec[0].config(text=self.a_button_txt[0])
+      self.a_button_vec[0].config(\
+          wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
+      self.a_button_vec[0].update()
+
+    # The talker has changed
+    if talker_changed:
+
+      if robot_talking:
+        self.a_button_vec[0].config(font=("Helvetica", 24))
+        self.a_button_vec[0].config(fg='#E0B548')
+        photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
+
+      if human_talking:
+        self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
+        self.a_button_vec[0].config(fg='#FFFFFF')
+        photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
+
+
+      self.q_button_vec[0].config(image=photo, compound=Tkinter.TOP)
+      self.q_button_vec[0].update()
+      self.a_button_vec[0].update()
+
+
+    # Release resource
+    self.rtf_lock == False
 
 
   ##############################################################################
@@ -685,6 +762,22 @@ class ExhibitDialogue():
     self.frame_ = frame
 
 
+  ##############################################################################
+#  def sha256sum(self,filename):
+    #h  = hashlib.sha256()
+    #b  = bytearray(128*1024)
+    #mv = memoryview(b)
+    #with open(filename, 'rb', buffering=0) as f:
+      #for n in iter(lambda : f.readinto(mv), 0):
+        #h.update(mv[:n])
+    #return h.hexdigest()
+
+
+  ##############################################################################
+  def sha256sum(self,in_string):
+    h  = hashlib.sha256()
+    h.update(in_string)
+    return h.hexdigest()
 
 
 ################################################################################
