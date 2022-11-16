@@ -312,11 +312,15 @@ class ExhibitDialogue():
       rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
       return
 
+    # Talkers' identifiers
     self.R = '[ROBOT]'
     self.H = '[HUMAN]'
 
     # init transcript
     self.transcript_ = ''
+
+    # should not be local variable, hence here I am
+    self.photo = ''
 
     # A lock on the `read_transcript_file` function
     self.rtf_lock = False
@@ -483,7 +487,7 @@ class ExhibitDialogue():
     self.q_button_vec.append(QButton)
 
     # The text of the question
-    self.q_button_txt.append(self.transcript_)
+    self.q_button_txt.append('')
 
     xNum = len(self.q_button_vec)
     yNum = 1
@@ -729,15 +733,15 @@ class ExhibitDialogue():
       if robot_talking:
         self.a_button_vec[0].config(font=("Helvetica", 24))
         self.a_button_vec[0].config(fg='#E0B548')
-        photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
+        self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
 
       if human_talking:
         self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
         self.a_button_vec[0].config(fg='#FFFFFF')
-        photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
+        self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
 
 
-      self.q_button_vec[0].config(image=photo, compound=Tkinter.TOP)
+      self.q_button_vec[0].config(image=self.photo)
       self.q_button_vec[0].update()
       self.a_button_vec[0].update()
 
