@@ -1,61 +1,61 @@
 Starting rasacontainer_action-server_1 ... 
 Starting rasacontainer_rasa_1 ... 
-[1A[2KStarting rasacontainer_rasa_1 ... [32mdone[0m[1B[1A[2KStarting rasacontainer_action-server_1 ... [32mdone[0m[1BAttaching to rasacontainer_rasa_1, rasacontainer_action-server_1
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.endpoint  - Starting action endpoint server...
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_iterate_form_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_exposition'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_importance'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_language'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_writer'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_creation'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_content'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_finding'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_introduce'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_goodbye'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_thanks'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_thanks_deny'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_name'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_age'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_occupation'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_favorite_subject'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_interested'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_reset_slots'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_abort_reset'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_ask_confirmation_to_reset'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_fallback'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_fallback_count'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_previous_requested_slot'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_previous_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_remind_slot'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_react_to_silence'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_silence_count'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_current_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_capabilities'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_introduce_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_submit_form_user'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_submit_form_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_validate_intents'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_list_intents'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_repeat'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_list_exhibit_utters'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_available_exhibits'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_remaining_exhibits'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_list_available_exhibit_utters'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_say_available_exhibits'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_stop_tour'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_flag_exhibit_utters'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_adult'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'action_no_change_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'validate_form_user'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.executor  - Registered function for 'validate_form_exhibit'.
-[33maction-server_1  |[0m 2022-11-17 10:55:53 INFO     rasa_sdk.endpoint  - Action endpoint is up and running on http://0.0.0.0:5055
-[36mrasa_1           |[0m 2022-11-17 10:55:55 INFO     root  - Starting Rasa server on http://0.0.0.0:5005
-[36mrasa_1           |[0m 2022-11-17 10:55:57 INFO     rasa.core.processor  - Loading model models/20220929-205818-recursive-pan.tar.gz...
-[36mrasa_1           |[0m 2022-11-17 10:55:58 INFO     rasa.nlu.utils.spacy_utils  - Trying to load SpaCy model with name 'el_core_news_md'.
-[36mrasa_1           |[0m 2022-11-17 10:56:00 INFO     rasa.nlu.utils.spacy_utils  - Trying to load SpaCy model with name 'el_core_news_md'.
-[36mrasa_1           |[0m 2022-11-17 10:56:35 WARNING  rasa.shared.utils.common  - The UnexpecTED Intent Policy is currently experimental and might change or be removed in the future 🔬 Please share your feedback on it in the forum (https://forum.rasa.com) to help us make this feature ready for production.
-[36mrasa_1           |[0m 2022-11-17 10:56:35 INFO     root  - Rasa server is up and running.
-[36mrasacontainer_rasa_1 exited with code 137
-[0m[33mrasacontainer_action-server_1 exited with code 137
+[1A[2KStarting rasacontainer_action-server_1 ... [32mdone[0m[1B[1A[2KStarting rasacontainer_rasa_1 ... [32mdone[0m[1BAttaching to rasacontainer_action-server_1, rasacontainer_rasa_1
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.endpoint  - Starting action endpoint server...
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_iterate_form_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_exposition'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_importance'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_language'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_writer'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_creation'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_content'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_finding'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_introduce'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_goodbye'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_thanks'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_thanks_deny'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_name'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_age'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_occupation'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_favorite_subject'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_interested'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_reset_slots'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_abort_reset'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_ask_confirmation_to_reset'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_fallback'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_fallback_count'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_previous_requested_slot'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_previous_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_remind_slot'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_react_to_silence'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_silence_count'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_current_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_capabilities'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_introduce_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_submit_form_user'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_submit_form_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_validate_intents'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_list_intents'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_repeat'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_list_exhibit_utters'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_available_exhibits'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_remaining_exhibits'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_list_available_exhibit_utters'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_say_available_exhibits'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_stop_tour'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_flag_exhibit_utters'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_set_slot_adult'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'action_no_change_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'validate_form_user'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.executor  - Registered function for 'validate_form_exhibit'.
+[36maction-server_1  |[0m 2022-11-17 12:13:58 INFO     rasa_sdk.endpoint  - Action endpoint is up and running on http://0.0.0.0:5055
+[33mrasa_1           |[0m 2022-11-17 12:14:03 INFO     root  - Starting Rasa server on http://0.0.0.0:5005
+[33mrasa_1           |[0m 2022-11-17 12:14:04 INFO     rasa.core.processor  - Loading model models/20220929-205818-recursive-pan.tar.gz...
+[33mrasa_1           |[0m 2022-11-17 12:14:05 INFO     rasa.nlu.utils.spacy_utils  - Trying to load SpaCy model with name 'el_core_news_md'.
+[33mrasa_1           |[0m 2022-11-17 12:14:08 INFO     rasa.nlu.utils.spacy_utils  - Trying to load SpaCy model with name 'el_core_news_md'.
+[33mrasa_1           |[0m 2022-11-17 12:14:41 WARNING  rasa.shared.utils.common  - The UnexpecTED Intent Policy is currently experimental and might change or be removed in the future 🔬 Please share your feedback on it in the forum (https://forum.rasa.com) to help us make this feature ready for production.
+[33mrasa_1           |[0m 2022-11-17 12:14:41 INFO     root  - Rasa server is up and running.
+[36mrasacontainer_action-server_1 exited with code 137
+[0m[33mrasacontainer_rasa_1 exited with code 137
 [0m

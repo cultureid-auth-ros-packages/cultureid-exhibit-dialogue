@@ -364,10 +364,13 @@ def text_to_speech(text):
         print('Done')
 
 
+    speech_duration = 0.0
     with wave.open(io.BytesIO(response.audio_content), 'rb') as f:
         width = f.getsampwidth()
         channels = f.getnchannels()
         rate = f.getframerate()
+        frames = f.getnframes()
+        speech_duration = frames / float(rate)
 
     pa = pyaudio.PyAudio()
 
@@ -377,6 +380,9 @@ def text_to_speech(text):
         rate=rate,
         output=True
     )
+
+    # https://stackoverflow.com/a/7833963
+    print('Duration of speech is = %f sec' % speech_duration)
 
     pa_stream.write(response.audio_content)
 
