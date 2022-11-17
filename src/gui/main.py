@@ -266,14 +266,13 @@ class ExhibitDialogue():
     if do_init_params:
       self.init_params()
 
-    else:
-      # new canvas
-      canvas = self.new_canvas()
-      self.set_canvas(canvas)
+    # new canvas
+    canvas = self.new_canvas()
+    self.set_canvas(canvas)
 
       # to frame panw sto opoio 8a einai ta koumpia
-      frame = self.new_frame()
-      self.set_frame(frame)
+    frame = self.new_frame()
+    self.set_frame(frame)
 
 
     # START BUTTON -------------------------------------------------------------
