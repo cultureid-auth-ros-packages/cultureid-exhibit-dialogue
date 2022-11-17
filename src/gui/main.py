@@ -6,6 +6,7 @@ import threading
 import os
 import numpy as np
 import time
+import copy
 from subprocess import call, Popen
 from functools import partial
 import random
@@ -89,7 +90,7 @@ class ExhibitDialogue():
     self.reset_file(self.transcript_file_path)
 
     # Let's go
-    self.main_screen()
+    self.init()
 
     # DJ...SPIN THAT SHIT
     self.root.mainloop()
@@ -253,92 +254,62 @@ class ExhibitDialogue():
 
 
   ##############################################################################
+  def init(self):
+    rospy.logwarn('init')
+
+    # new canvas
+    canvas = self.new_canvas()
+    self.set_canvas(canvas)
+
+    # to frame panw sto opoio 8a einai ta koumpia
+    frame = self.new_frame()
+    self.set_frame(frame)
+
+    # ta koumpia tou para8urou
+    buttonVec = []
+    buttonText = []
+
+    buttonText.append('ΕΚΚΙΝΗΣΗ')
+    sg = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40',command=self.main_screen)
+    buttonVec.append(sg)
+
+    xNum = 1
+    yNum = len(buttonVec)
+
+    xEff = 1
+    yEff = 1
+
+    GP = 0.05
+
+    xWithGuard = xEff/xNum
+    xG = GP*xWithGuard
+    xB = xWithGuard-xG
+
+    yWithGuard = yEff/yNum
+    yG = GP*yWithGuard
+    yB = yWithGuard-yG
+
+    counter = 0
+    for xx in range(xNum):
+      for yy in range(yNum):
+        thisX = xG/2+xx*xWithGuard
+        thisY = yG/2+yy*yWithGuard
+
+        buttonVec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
+        buttonVec[counter].config(text=buttonText[counter])
+        buttonVec[counter].update()
+
+        thisWidth = buttonVec[counter].winfo_width()
+        thisHeight = buttonVec[counter].winfo_height()
+        buttonVec[counter].config(font=("Helvetica", 30))
+        buttonVec[counter].update()
+
+        counter = counter+1
+
+  ##############################################################################
   def init_params(self):
 
-    self.pkg_name = rospy.get_param('~pkg_name', '')
-    self.pkg_ap = rospy.get_param('~pkg_ap', '')
-    self.exhibit_titles = rospy.get_param('~exhibit_titles', '')
-    self.exhibit_codes = rospy.get_param('~exhibit_codes', '')
-    self.listening_imagefile = rospy.get_param('~listening_imagefile', '')
-    self.speaking_imagefile = rospy.get_param('~speaking_imagefile', '')
-    self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
-    self.navigation_audiofile = rospy.get_param('~navigation_audiofile', '')
-    self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
-    self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
-    self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
-
-
-    if self.pkg_name == '':
-      rospy.logerr('ExhibitDialogue pkg_name not set; aborting')
-      return
-
-    if self.pkg_ap == '':
-      rospy.logerr('ExhibitDialogue pkg_ap not set; aborting')
-      return
-
-    if self.exhibit_titles == '':
-      rospy.logerr('[%s] exhibit_titles not set; aborting', self.pkg_name)
-      return
-
-    if self.exhibit_codes == '':
-      rospy.logerr('[%s] exhibit_codes not set; aborting', self.pkg_name)
-      return
-
-    if self.listening_imagefile == '':
-      rospy.logerr('[%s] listening_imagefile not set; aborting', self.pkg_name)
-      return
-
-    if self.speaking_imagefile == '':
-      rospy.logerr('[%s] speaking_imagefile not set; aborting', self.pkg_name)
-      return
-
-    if self.navigation_warnfile == '':
-      rospy.logerr('[%s] navigation_warnfile not set; aborting', self.pkg_name)
-      return
-
-    if self.navigation_audiofile == '':
-      rospy.logerr('[%s] navigation_audiofile not set; aborting', self.pkg_name)
-      return
-
-    if self.navigation_imagefile == '':
-      rospy.logerr('[%s] navigation_imagefile not set; aborting', self.pkg_name)
-      return
-
-    if self.transcript_file_path == '':
-      rospy.logerr('[%s] transcript_file_path not set; aborting', self.pkg_name)
-      return
-
-    if self.transcript_file_readrate == '':
-      rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
-      return
-
-    # Talkers' identifiers
-    self.R = '[ROBOT]'
-    self.H = '[HUMAN]'
-
-    # init transcript
-    self.transcript_ = ''
-
-    # should not be local variable, hence here I am
-    self.photo = ''
-
-    # A lock on the `read_transcript_file` function
-    self.rtf_lock = False
-
-    # The main screen's buttons and their text
-    self.q_button_vec = []
-    self.q_button_txt = []
-    self.a_button_vec = []
-    self.a_button_txt = []
-
-    # Talking Sequence Pair: [0] for current talker, [1] for previous
-    self.tsp = pair(None,None)
-
-    # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
-    self.ssp = pair(0,0)
-
-    # Which exhibits have been viewed, in order.
-    self.exhibit_codes_played = []
+    self.reset_params()
 
     # Get a move_base action client
     self.action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
@@ -350,6 +321,9 @@ class ExhibitDialogue():
   ##############################################################################
   def kill_root(self):
     rospy.logerr('[%s] Dialogue over', self.pkg_name)
+
+    # Shutdown rasa docker and send_node
+    call(['bash', '/home/cultureid_user0/game_desktop_launchers/exhibit_dialogue_amth_speech_stuff_down.sh'])
     call(['bash', '/home/cultureid_user0/game_desktop_launchers/kill_all.sh'])
     self.root.destroy()
     os._exit(os.EX_OK)
@@ -487,7 +461,7 @@ class ExhibitDialogue():
     self.q_button_vec.append(QButton)
 
     # The text of the question
-    self.q_button_txt.append('')
+    self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΠΕΡΙΜΕΝΕΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
 
     xNum = len(self.q_button_vec)
     yNum = 1
@@ -518,7 +492,7 @@ class ExhibitDialogue():
         thisWidth = self.q_button_vec[counter].winfo_width()
         thisHeight = self.q_button_vec[counter].winfo_height()
 
-        self.q_button_vec[counter].config(font=("Helvetica", 16))
+        self.q_button_vec[counter].config(font=("Helvetica", 30))
         self.q_button_vec[counter].update()
 
         counter = counter+1
@@ -527,7 +501,7 @@ class ExhibitDialogue():
 
 
     # Show A -------------------------------------------------------------------
-    self.a_button_txt.append(self.transcript_)
+    self.a_button_txt.append('ΕΔΩ ΘΑ ΣΑΣ ΔΕΙΧΝΩ ΤΙ ΛΕΩ ΚΑΙ ΤΙ ΝΟΜΙΖΩ ΟΤΙ ΛΕΤΕ ΕΣΕΙΣ')
     this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40')
     self.a_button_vec.append(this_butt)
 
@@ -564,6 +538,12 @@ class ExhibitDialogue():
           self.a_button_vec[counter].update()
 
         counter = counter+1
+
+    # Init rasa and google stuff
+    call(['bash', '/home/cultureid_user0/game_desktop_launchers/exhibit_dialogue_amth_speech_stuff_up.sh'])
+
+    # We may now begin processing
+    self.rtf_lock = False
 
 
   ##############################################################################
@@ -687,26 +667,38 @@ class ExhibitDialogue():
     # Read content of transcript file
     with open(self.transcript_file_path,'r') as f:
       lines = f.readlines()
-    self.transcript_ = ''.join(lines)
+    transcript = ''.join(lines)
 
     # Update hash value of transcript
-    self.ssp.update(self.sha256sum(self.transcript_))
+    self.ssp.update(self.sha256sum(transcript))
 
-    # Determine who's talking
-    robot_talking = self.transcript_.find(self.R) != -1
-    human_talking = self.transcript_.find(self.H) != -1
+    # Determine who's talking or if the robot is simply waiting (listening)
+    robot_lsening = transcript.find(self.R_) != -1
+    robot_talking = transcript.find(self.R) != -1 and not robot_lsening
+    human_talking = transcript.find(self.H) != -1
 
-    # No one is talking
-    if robot_talking == human_talking:
-      rospy.logwarn('[%s] No speech whatsoever from any side', self.pkg_name)
-      return
+
+    # No one is talking. DON'T `return`: the human can only be heard when the
+    # robot isn't speaking, but she is not necessarily talking (the listening
+    # image shall be displayed when the robot is not speaking)
+    #if robot_talking == human_talking:
+      #rospy.logwarn('[%s] No speech whatsoever from any side', self.pkg_name)
 
     # Queue current talker
-    if robot_talking:
+    if robot_lsening :
+      self.tsp.update(self.R_)
+      transcript = transcript.replace(self.R+' ','')
+      transcript = transcript.replace(' '+self.R_,'')
+    elif robot_talking :
       self.tsp.update(self.R)
-    elif human_talking:
+      transcript = transcript.replace(self.R+' ','')
+    elif human_talking :
       self.tsp.update(self.H)
+      transcript = transcript.replace(self.H+ ' ','')
 
+
+    # Update (perhaps) the transcript
+    self.transcript = transcript
 
     # Detect if talker or transcript changed since last call:
     # screen modifications occur only during these events
@@ -714,36 +706,48 @@ class ExhibitDialogue():
     transc_changed = not self.ssp.equality()
 
 
-    # The transcript has changed
+    # The transcript has changed -----------------------------------------------
     if transc_changed:
-      if robot_talking:
-        self.transcript_ = self.transcript_[len(self.R)+1:]
-      if human_talking:
-        self.transcript_ = self.transcript_[len(self.H)+1:]
 
-      self.a_button_txt[0] = self.transcript_
+      if self.transcript == 'έξοδος':
+        # Robot should say goodbye here TODO just run `speech_algorithm_for_rasa.py:text_to_speech` in a single .sh script?
+        call(['bash', '/home/cultureid_user0/game_desktop_launchers/exhibit_dialogue_amth_speech_stuff_down.sh'])
+        self.reset_params()
+        self.init()
+        return
+
+      self.a_button_txt[0] = self.transcript
       self.a_button_vec[0].config(text=self.a_button_txt[0])
       self.a_button_vec[0].config(\
           wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
       self.a_button_vec[0].update()
 
-    # The talker has changed
+
+    # The talker has changed ---------------------------------------------------
     if talker_changed:
+
+      if robot_lsening :
+        self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
+        self.q_button_vec[0].config(image=self.photo)
+        self.q_button_vec[0].update()
 
       if robot_talking:
         self.a_button_vec[0].config(font=("Helvetica", 24))
         self.a_button_vec[0].config(fg='#E0B548')
+        self.a_button_vec[0].update()
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
+        self.q_button_vec[0].config(image=self.photo)
+        self.q_button_vec[0].update()
 
-      if human_talking:
+      if human_talking :
         self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
         self.a_button_vec[0].config(fg='#FFFFFF')
+        self.a_button_vec[0].update()
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
+        self.q_button_vec[0].config(image=self.photo)
+        self.q_button_vec[0].update()
 
 
-      self.q_button_vec[0].config(image=self.photo)
-      self.q_button_vec[0].update()
-      self.a_button_vec[0].update()
 
 
     # Release resource
@@ -754,6 +758,94 @@ class ExhibitDialogue():
   def reset_file(self, file_str):
     with open(file_str,'w') as f:
       f.close()
+
+  ##############################################################################
+  def reset_params(self):
+    self.pkg_name = rospy.get_param('~pkg_name', '')
+    self.pkg_ap = rospy.get_param('~pkg_ap', '')
+    self.exhibit_titles = rospy.get_param('~exhibit_titles', '')
+    self.exhibit_codes = rospy.get_param('~exhibit_codes', '')
+    self.listening_imagefile = rospy.get_param('~listening_imagefile', '')
+    self.speaking_imagefile = rospy.get_param('~speaking_imagefile', '')
+    self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
+    self.navigation_audiofile = rospy.get_param('~navigation_audiofile', '')
+    self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
+    self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
+    self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
+
+
+    if self.pkg_name == '':
+      rospy.logerr('ExhibitDialogue pkg_name not set; aborting')
+      return
+
+    if self.pkg_ap == '':
+      rospy.logerr('ExhibitDialogue pkg_ap not set; aborting')
+      return
+
+    if self.exhibit_titles == '':
+      rospy.logerr('[%s] exhibit_titles not set; aborting', self.pkg_name)
+      return
+
+    if self.exhibit_codes == '':
+      rospy.logerr('[%s] exhibit_codes not set; aborting', self.pkg_name)
+      return
+
+    if self.listening_imagefile == '':
+      rospy.logerr('[%s] listening_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.speaking_imagefile == '':
+      rospy.logerr('[%s] speaking_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.navigation_warnfile == '':
+      rospy.logerr('[%s] navigation_warnfile not set; aborting', self.pkg_name)
+      return
+
+    if self.navigation_audiofile == '':
+      rospy.logerr('[%s] navigation_audiofile not set; aborting', self.pkg_name)
+      return
+
+    if self.navigation_imagefile == '':
+      rospy.logerr('[%s] navigation_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.transcript_file_path == '':
+      rospy.logerr('[%s] transcript_file_path not set; aborting', self.pkg_name)
+      return
+
+    if self.transcript_file_readrate == '':
+      rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
+      return
+
+    # Talkers' identifiers
+    self.R = '[ROBOT]'
+    self.R_ = '[/ROBOT]'
+    self.H = '[HUMAN]'
+
+    # init transcript
+    self.transcript = ''
+
+    # should not be local variable, hence here I am
+    self.photo = ''
+
+    # A lock on the `read_transcript_file` function
+    self.rtf_lock = True
+
+    # The main screen's buttons and their text
+    self.q_button_vec = []
+    self.q_button_txt = []
+    self.a_button_vec = []
+    self.a_button_txt = []
+
+    # Talking Sequence Pair: [0] for current talker, [1] for previous
+    self.tsp = pair(None,None)
+
+    # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
+    self.ssp = pair(0,0)
+
+    # Which exhibits have been viewed, in order.
+    self.exhibit_codes_played = []
 
 
   ##############################################################################

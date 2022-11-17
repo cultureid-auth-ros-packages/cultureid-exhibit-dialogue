@@ -46,12 +46,15 @@ class S2S():
         text = bot_message["text"]
         self.robot_speech_text_ = text
 
-        #print('ROBOT')
-        #print(self.robot_speech_text_)
+        # Write transcript of voice to transcript file
         self.write_file('[ROBOT] ' + self.robot_speech_text_, self.transcript_file_)
 
-        # Speak text
+        # Speak text; blocks until all words are spoken
         text_to_speech(self.robot_speech_text_)
+
+        # Signify end of speech
+        self.reset_file(self.transcript_file_)
+        self.write_file('[ROBOT] ' + self.robot_speech_text_ + ' [/ROBOT]', self.transcript_file_)
 
     return response
 
@@ -89,8 +92,8 @@ class S2S():
         print("[cultureid-exhibit-dialogue; s2s] exception thrown while listening to human; pathetic")
         continue
 
-      if self.human_speech_text_ == "έξοδος":
-        break
+      #if self.human_speech_text_ == "έξοδος":
+        #break
 
       response = self.funcc(self.human_speech_text_)
 
