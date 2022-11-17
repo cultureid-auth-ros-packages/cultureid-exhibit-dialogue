@@ -21,7 +21,7 @@ do
   fi
 done
 
-echo '[BASH cultureid_exhibit_dialogue] RASA FIRED UP'
+echo '[BASH cultureid_exhibit_dialogue] RASA IS RUNNING'
 echo '[BASH cultureid_exhibit_dialogue] executing S2S'
 
 # S2S cannot exist without rasa. S2S may now be executed

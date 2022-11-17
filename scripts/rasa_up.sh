@@ -17,8 +17,8 @@ if [ $o1 -ne 0 ]
 then
   echo '[BASH cultureid_exhibit_dialogue] rasa output file does not exist; on your way...'
 else
-  echo '[BASH cultureid_exhibit_dialogue] rasa output file exists; no problem chief, erasing contents...'
-  > $rasa_output_file
+  echo '[BASH cultureid_exhibit_dialogue] rasa output file exists; no problem chief, removing it...'
+  rm $rasa_output_file
 fi
 
 # Execute docker and redirect output to `rasa_output_file`
