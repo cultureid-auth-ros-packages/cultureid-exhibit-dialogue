@@ -20,6 +20,11 @@
     <param name="transcript_file_path"        value="$(arg pkg_ap)/transcripts/transcript.txt" />
     <param name="transcript_file_readrate"    value="10.0" />
 
+    <param name="rasa_upfile"                 value="$(arg pkg_ap)/scripts/rasa_up.sh" />
+    <param name="rasa_downfile"               value="$(arg pkg_ap)/scripts/rasa_down.sh" />
+    <param name="s2s_upfile"                  value="$(arg pkg_ap)/scripts/s2s_up.sh" />
+    <param name="s2s_downfile"                value="$(arg pkg_ap)/scripts/s2s_down.sh" />
+
     <rosparam command="load"                  file="$(arg pkg_ap)/config/exhibits.yaml" />
     <rosparam command="load"                  file="$(arg pkg_ap)/config/to_load.yaml" />
 

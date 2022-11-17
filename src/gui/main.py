@@ -70,6 +70,9 @@ class ExhibitDialogue():
     self.root = Tkinter.Tk()
     self.root.attributes('-fullscreen',True)
 
+    # Load params for this class
+    self.init_params()
+
     # Sets the pose estimate of amcl
     self.amcl_init_pose_pub = \
         rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=10, latch=True)
@@ -79,8 +82,11 @@ class ExhibitDialogue():
     self.raw_velocity_commands_pub = \
         rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=10)
 
-    # Load params for this class
-    self.init_params()
+    # Get a move_base action client
+    self.action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+    rospy.loginfo('[%s] Waiting to connect to move_base...', self.pkg_name)
+    #self.action_client.wait_for_server()
+    rospy.loginfo('[%s] Connected to move_base.', self.pkg_name)
 
     # Read transcript file every `read_rate` seconds
     tf_read_rate = rospy.Duration(1.0 / self.transcript_file_readrate)
@@ -89,12 +95,11 @@ class ExhibitDialogue():
     # When starting-up reset the transcript file
     self.reset_file(self.transcript_file_path)
 
-    # Let's go
-    self.init()
+    # Let's go (False: do not init params; they have already been inited)
+    self.init(False)
 
     # DJ...SPIN THAT SHIT
     self.root.mainloop()
-
 
 
   ##############################################################################
@@ -152,7 +157,8 @@ class ExhibitDialogue():
     buttonVec = []
     buttonText = []
 
-    this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='red',activeforeground='#E0B548',activebackground='#343A40', command=self.kill_root)
+    this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='red',activeforeground='#E0B548',activebackground='#343A40', command=self.process_exit_button_press)
+
 
     buttonVec.append(this_butt)
     this_group_name = 'X'
@@ -254,32 +260,38 @@ class ExhibitDialogue():
 
 
   ##############################################################################
-  def init(self):
+  def init(self, do_init_params):
     rospy.logwarn('init')
 
-    # new canvas
-    canvas = self.new_canvas()
-    self.set_canvas(canvas)
+    if do_init_params:
+      self.init_params()
 
-    # to frame panw sto opoio 8a einai ta koumpia
-    frame = self.new_frame()
-    self.set_frame(frame)
+    else:
+      # new canvas
+      canvas = self.new_canvas()
+      self.set_canvas(canvas)
 
-    # ta koumpia tou para8urou
-    buttonVec = []
-    buttonText = []
+      # to frame panw sto opoio 8a einai ta koumpia
+      frame = self.new_frame()
+      self.set_frame(frame)
 
-    buttonText.append('ΕΚΚΙΝΗΣΗ')
-    sg = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40',command=self.main_screen)
-    buttonVec.append(sg)
 
-    xNum = 1
-    yNum = len(buttonVec)
+    # START BUTTON -------------------------------------------------------------
+    QButton = Tkinter.Button(self.frame_,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=self.main_screen)
+    q_button_vec = []
+    q_button_vec.append(QButton)
 
-    xEff = 1
-    yEff = 1
+    # The text of the question
+    q_button_txt = []
+    q_button_txt.append('ΕΚΚΙΝΗΣΗ')
 
-    GP = 0.05
+    xNum = len(q_button_vec)
+    yNum = 1
+
+
+    xEff = 1.0
+    yEff = 0.7
+    GP = 0.1
 
     xWithGuard = xEff/xNum
     xG = GP*xWithGuard
@@ -293,37 +305,178 @@ class ExhibitDialogue():
     for xx in range(xNum):
       for yy in range(yNum):
         thisX = xG/2+xx*xWithGuard
-        thisY = yG/2+yy*yWithGuard
+        thisY = yG/2+yy*yWithGuard+0.1
 
-        buttonVec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
-        buttonVec[counter].config(text=buttonText[counter])
-        buttonVec[counter].update()
+        q_button_vec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
+        q_button_vec[counter].config(text=q_button_txt[counter])
+        q_button_vec[counter].update()
 
-        thisWidth = buttonVec[counter].winfo_width()
-        thisHeight = buttonVec[counter].winfo_height()
-        buttonVec[counter].config(font=("Helvetica", 30))
-        buttonVec[counter].update()
+        thisWidth = q_button_vec[counter].winfo_width()
+        thisHeight = q_button_vec[counter].winfo_height()
+
+        q_button_vec[counter].config(font=("Helvetica", 30))
+        q_button_vec[counter].update()
 
         counter = counter+1
+
+
+
+
+    # KILL APP BUTTON --------------------------------------------------------------
+    this_butt = Tkinter.Button(self.frame_,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40', \
+        command=self.kill_root)
+    a_button_vec = []
+    a_button_vec.append(this_butt)
+
+    a_button_txt = []
+    a_button_txt.append('ΕΞΟΔΟΣ')
+
+    xNum,yNum = self.get_x_y_dims(len(a_button_vec))
+
+    xEff = 1.0
+    yEff = 0.2
+    GP = 0.1
+
+    xWithGuard = xEff/xNum
+    xG = GP*xWithGuard
+    xB = xWithGuard-xG
+
+    yWithGuard = yEff/yNum
+    yG = GP*yWithGuard
+    yB = yWithGuard-yG
+
+    counter = 0
+    for xx in range(xNum):
+      for yy in range(yNum):
+
+        if counter < len(a_button_vec):
+          thisX = xG/2+xx*xWithGuard
+          thisY = yG/2+yy*yWithGuard+1-yEff
+
+          a_button_vec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
+          a_button_vec[counter].config(text=a_button_txt[counter])
+          a_button_vec[counter].update()
+
+          thisWidth = a_button_vec[counter].winfo_width()
+          thisHeight = a_button_vec[counter].winfo_height()
+          a_button_vec[counter].config(font=("Helvetica", 24))
+          a_button_vec[counter].config(wraplength=thisWidth-10,justify="center")
+          a_button_vec[counter].update()
+
+        counter = counter+1
+
 
   ##############################################################################
   def init_params(self):
 
-    self.reset_params()
+    self.pkg_name = rospy.get_param('~pkg_name', '')
+    self.pkg_ap = rospy.get_param('~pkg_ap', '')
+    self.exhibit_titles = rospy.get_param('~exhibit_titles', '')
+    self.exhibit_codes = rospy.get_param('~exhibit_codes', '')
+    self.listening_imagefile = rospy.get_param('~listening_imagefile', '')
+    self.speaking_imagefile = rospy.get_param('~speaking_imagefile', '')
+    self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
+    self.navigation_audiofile = rospy.get_param('~navigation_audiofile', '')
+    self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
+    self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
+    self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
+    self.rasa_upfile = rospy.get_param('~rasa_upfile', '')
+    self.rasa_downfile = rospy.get_param('~rasa_downfile', '')
+    self.s2s_upfile = rospy.get_param('~s2s_upfile', '')
+    self.s2s_downfile = rospy.get_param('~s2s_downfile', '')
 
-    # Get a move_base action client
-    self.action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-    rospy.loginfo('[%s] Waiting to connect to move_base...', self.pkg_name)
-    #self.action_client.wait_for_server()
-    rospy.loginfo('[%s] Connected to move_base.', self.pkg_name)
+
+    if self.pkg_name == '':
+      rospy.logerr('ExhibitDialogue pkg_name not set; aborting')
+      return
+
+    if self.pkg_ap == '':
+      rospy.logerr('ExhibitDialogue pkg_ap not set; aborting')
+      return
+
+    if self.exhibit_titles == '':
+      rospy.logerr('[%s] exhibit_titles not set; aborting', self.pkg_name)
+      return
+
+    if self.exhibit_codes == '':
+      rospy.logerr('[%s] exhibit_codes not set; aborting', self.pkg_name)
+      return
+
+    if self.listening_imagefile == '':
+      rospy.logerr('[%s] listening_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.speaking_imagefile == '':
+      rospy.logerr('[%s] speaking_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.navigation_warnfile == '':
+      rospy.logerr('[%s] navigation_warnfile not set; aborting', self.pkg_name)
+      return
+
+    if self.navigation_audiofile == '':
+      rospy.logerr('[%s] navigation_audiofile not set; aborting', self.pkg_name)
+      return
+
+    if self.navigation_imagefile == '':
+      rospy.logerr('[%s] navigation_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.transcript_file_path == '':
+      rospy.logerr('[%s] transcript_file_path not set; aborting', self.pkg_name)
+      return
+
+    if self.transcript_file_readrate == '':
+      rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
+      return
+
+    if self.rasa_upfile== '':
+      rospy.logerr('[%s] rasa_upfile not set; aborting', self.pkg_name)
+      return
+    if self.rasa_downfile== '':
+      rospy.logerr('[%s] rasa_downfile not set; aborting', self.pkg_name)
+      return
+    if self.s2s_upfile== '':
+      rospy.logerr('[%s] s2s_upfile not set; aborting', self.pkg_name)
+      return
+    if self.s2s_downfile== '':
+      rospy.logerr('[%s] s2s_downfile not set; aborting', self.pkg_name)
+      return
+
+    # Talkers' identifiers
+    self.R = '[ROBOT]'
+    self.R_ = '[/ROBOT]'
+    self.H = '[HUMAN]'
+
+    # init transcript
+    self.transcript = ''
+
+    # should not be local variable, hence here I am
+    self.photo = ''
+
+    # A lock on the `read_transcript_file` function
+    self.rtf_lock = True
+
+    # The main screen's buttons and their text
+    self.q_button_vec = []
+    self.q_button_txt = []
+    self.a_button_vec = []
+    self.a_button_txt = []
+
+    # Talking Sequence Pair: [0] for current talker, [1] for previous
+    self.tsp = pair(None,None)
+
+    # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
+    self.ssp = pair(0,0)
+
+    # Which exhibits have been viewed, in order.
+    self.exhibit_codes_played = []
 
 
   ##############################################################################
   def kill_root(self):
-    rospy.logerr('[%s] Dialogue over', self.pkg_name)
+    rospy.logerr('[%s] Dialogue over. See you next time', self.pkg_name)
 
-    # Shutdown rasa docker and send_node
-    call(['bash', '/home/cultureid_user0/game_desktop_launchers/exhibit_dialogue_amth_speech_stuff_down.sh'])
     call(['bash', '/home/cultureid_user0/game_desktop_launchers/kill_all.sh'])
     self.root.destroy()
     os._exit(os.EX_OK)
@@ -461,7 +614,7 @@ class ExhibitDialogue():
     self.q_button_vec.append(QButton)
 
     # The text of the question
-    self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΠΕΡΙΜΕΝΕΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
+    self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΝΑΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
 
     xNum = len(self.q_button_vec)
     yNum = 1
@@ -496,7 +649,6 @@ class ExhibitDialogue():
         self.q_button_vec[counter].update()
 
         counter = counter+1
-
 
 
 
@@ -539,8 +691,10 @@ class ExhibitDialogue():
 
         counter = counter+1
 
+
     # Init rasa and google stuff
-    call(['bash', '/home/cultureid_user0/game_desktop_launchers/exhibit_dialogue_amth_speech_stuff_up.sh'])
+    call(['bash', self.rasa_upfile])
+    call(['bash', self.s2s_upfile])
 
     # We may now begin processing
     self.rtf_lock = False
@@ -650,6 +804,20 @@ class ExhibitDialogue():
 
 
   ##############################################################################
+  def process_exit_button_press(self):
+
+    # Robot should say goodbye here TODO
+    call(['bash', self.s2s_downfile])
+    call(['bash', self.rasa_downfile])
+
+    # Clear content of transcript file
+    self.reset_file(self.transcript_file_path)
+
+    # Here we go again with default params
+    self.init(True)
+
+
+  ##############################################################################
   # Every time the transcript is read two things have to be determined:
   # (a) Did the transcript change? (if not do not update the subtitle)
   # (b) Did the author change?     (if not do not update the surtitle
@@ -709,13 +877,6 @@ class ExhibitDialogue():
     # The transcript has changed -----------------------------------------------
     if transc_changed:
 
-      if self.transcript == 'έξοδος':
-        # Robot should say goodbye here TODO just run `speech_algorithm_for_rasa.py:text_to_speech` in a single .sh script?
-        call(['bash', '/home/cultureid_user0/game_desktop_launchers/exhibit_dialogue_amth_speech_stuff_down.sh'])
-        self.reset_params()
-        self.init()
-        return
-
       self.a_button_txt[0] = self.transcript
       self.a_button_vec[0].config(text=self.a_button_txt[0])
       self.a_button_vec[0].config(\
@@ -758,94 +919,6 @@ class ExhibitDialogue():
   def reset_file(self, file_str):
     with open(file_str,'w') as f:
       f.close()
-
-  ##############################################################################
-  def reset_params(self):
-    self.pkg_name = rospy.get_param('~pkg_name', '')
-    self.pkg_ap = rospy.get_param('~pkg_ap', '')
-    self.exhibit_titles = rospy.get_param('~exhibit_titles', '')
-    self.exhibit_codes = rospy.get_param('~exhibit_codes', '')
-    self.listening_imagefile = rospy.get_param('~listening_imagefile', '')
-    self.speaking_imagefile = rospy.get_param('~speaking_imagefile', '')
-    self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
-    self.navigation_audiofile = rospy.get_param('~navigation_audiofile', '')
-    self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
-    self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
-    self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
-
-
-    if self.pkg_name == '':
-      rospy.logerr('ExhibitDialogue pkg_name not set; aborting')
-      return
-
-    if self.pkg_ap == '':
-      rospy.logerr('ExhibitDialogue pkg_ap not set; aborting')
-      return
-
-    if self.exhibit_titles == '':
-      rospy.logerr('[%s] exhibit_titles not set; aborting', self.pkg_name)
-      return
-
-    if self.exhibit_codes == '':
-      rospy.logerr('[%s] exhibit_codes not set; aborting', self.pkg_name)
-      return
-
-    if self.listening_imagefile == '':
-      rospy.logerr('[%s] listening_imagefile not set; aborting', self.pkg_name)
-      return
-
-    if self.speaking_imagefile == '':
-      rospy.logerr('[%s] speaking_imagefile not set; aborting', self.pkg_name)
-      return
-
-    if self.navigation_warnfile == '':
-      rospy.logerr('[%s] navigation_warnfile not set; aborting', self.pkg_name)
-      return
-
-    if self.navigation_audiofile == '':
-      rospy.logerr('[%s] navigation_audiofile not set; aborting', self.pkg_name)
-      return
-
-    if self.navigation_imagefile == '':
-      rospy.logerr('[%s] navigation_imagefile not set; aborting', self.pkg_name)
-      return
-
-    if self.transcript_file_path == '':
-      rospy.logerr('[%s] transcript_file_path not set; aborting', self.pkg_name)
-      return
-
-    if self.transcript_file_readrate == '':
-      rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
-      return
-
-    # Talkers' identifiers
-    self.R = '[ROBOT]'
-    self.R_ = '[/ROBOT]'
-    self.H = '[HUMAN]'
-
-    # init transcript
-    self.transcript = ''
-
-    # should not be local variable, hence here I am
-    self.photo = ''
-
-    # A lock on the `read_transcript_file` function
-    self.rtf_lock = True
-
-    # The main screen's buttons and their text
-    self.q_button_vec = []
-    self.q_button_txt = []
-    self.a_button_vec = []
-    self.a_button_txt = []
-
-    # Talking Sequence Pair: [0] for current talker, [1] for previous
-    self.tsp = pair(None,None)
-
-    # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
-    self.ssp = pair(0,0)
-
-    # Which exhibits have been viewed, in order.
-    self.exhibit_codes_played = []
 
 
   ##############################################################################
