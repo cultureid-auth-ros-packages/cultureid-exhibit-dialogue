@@ -317,7 +317,7 @@ def speech_to_text(transcript_write_file):
 
 
 #-------------------------------------------------------------------------------
-def text_to_speech(text):
+def text_to_speech(text,time_file):
 
     SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
     cred = service_account.Credentials.from_service_account_file('solid-scope-361216-f63934ecc11d.json', scopes=SCOPES)
@@ -386,8 +386,14 @@ def text_to_speech(text):
     )
 
     # https://stackoverflow.com/a/7833963
-    print('Duration of speech is = %f sec' % speech_duration)
+    if DEBUG:
+      print('Duration of speech is = %f sec' % speech_duration)
 
+    reset_file(time_file)
+    write_file(str(speech_duration), time_file)
+    time.sleep(0.2)
+
+    # SPEAK OH TOOTHLESS ONE
     pa_stream.write(response.audio_content)
 
 

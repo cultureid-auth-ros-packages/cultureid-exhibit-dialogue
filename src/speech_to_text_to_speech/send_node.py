@@ -12,7 +12,7 @@ class S2S():
   ##############################################################################
   # constructor
   ##############################################################################
-  def __init__(self, transcript_file):
+  def __init__(self, transcript_file, robot_speech_time_file):
 
     # Transcript of robot speech
     self.robot_speech_text_ = ''
@@ -22,6 +22,9 @@ class S2S():
 
     # Write each transcript into a single file
     self.transcript_file_ = transcript_file
+
+    # Write the duration of each robot speech into a file
+    self.robot_speech_time_file_ = robot_speech_time_file
 
     # This is the meat
     self.talk_to_bot_via_rest()
@@ -50,7 +53,7 @@ class S2S():
         self.write_file('[ROBOT] ' + self.robot_speech_text_, self.transcript_file_)
 
         # Speak text; blocks until all words are spoken
-        text_to_speech(self.robot_speech_text_)
+        text_to_speech(self.robot_speech_text_, self.robot_speech_time_file_)
 
         # Signify end of speech
         self.reset_file(self.transcript_file_)
@@ -117,4 +120,5 @@ class S2S():
 if __name__ == '__main__':
 
   transcript_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/transcript.txt'
-  s = S2S(transcript_file)
+  speech_time_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/speech_time.txt'
+  s = S2S(transcript_file, speech_time_file)

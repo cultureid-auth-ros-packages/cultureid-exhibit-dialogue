@@ -191,6 +191,7 @@ class ExhibitDialogueMain():
     self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
     self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
     self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
+    self.robot_speech_duration_file_path = rospy.get_param('~speech_duration_file_path', '')
     self.rasa_upfile = rospy.get_param('~rasa_upfile', '')
     self.rasa_downfile = rospy.get_param('~rasa_downfile', '')
     self.s2s_upfile = rospy.get_param('~s2s_upfile', '')
@@ -239,6 +240,10 @@ class ExhibitDialogueMain():
 
     if self.transcript_file_readrate == '':
       rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
+      return
+
+    if self.robot_speech_duration_file_path == '':
+      rospy.logerr('[%s] robot_speech_duration_file_path  not set; aborting', self.pkg_name)
       return
 
     if self.rasa_upfile== '':

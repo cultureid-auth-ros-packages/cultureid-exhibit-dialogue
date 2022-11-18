@@ -78,7 +78,7 @@ class ExhibitDialogue():
         rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=10, latch=True)
 
     # Publishes raw velocity commands to the wheels of the base
-    # [for initial pose calibration]
+    # [for looking like it's addressing someone]
     self.raw_velocity_commands_pub = \
         rospy.Publisher('/mobile_base/commands/velocity', Twist, queue_size=10)
 
@@ -94,6 +94,9 @@ class ExhibitDialogue():
 
     # When starting-up reset the transcript file
     self.reset_file(self.transcript_file_path)
+
+    # When starting-up reset the robot_speech_duration file
+    self.reset_file(self.robot_speech_duration_file_path)
 
     # Let's go (False: do not init params; they have already been inited)
     self.init(False)
@@ -381,6 +384,7 @@ class ExhibitDialogue():
     self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
     self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
     self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
+    self.robot_speech_duration_file_path = rospy.get_param('~speech_duration_file_path', '')
     self.rasa_upfile = rospy.get_param('~rasa_upfile', '')
     self.rasa_downfile = rospy.get_param('~rasa_downfile', '')
     self.s2s_upfile = rospy.get_param('~s2s_upfile', '')
@@ -431,6 +435,10 @@ class ExhibitDialogue():
       rospy.logerr('[%s] transcript_file_readrate not set; aborting', self.pkg_name)
       return
 
+    if self.robot_speech_duration_file_path  == '':
+      rospy.logerr('[%s] robot_speech_duration_file_path not set; aborting', self.pkg_name)
+      return
+
     if self.rasa_upfile== '':
       rospy.logerr('[%s] rasa_upfile not set; aborting', self.pkg_name)
       return
@@ -471,11 +479,16 @@ class ExhibitDialogue():
     # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
     self.ssp = pair(0,0)
 
+    # Sha256 robot duration Pair:  [0] for current sha,    [1] for previous
+    self.rdp = pair(0,0)
+
     # Which exhibits have been viewed, in order.
     self.exhibit_codes_played = []
 
 
   ##############################################################################
+  # TRIPLE CAUTION SAMMY
+  # DO NOT CHANGE ORDER OF EXECUTION
   def kill_root(self):
 
     # Show "killing, please wait"
@@ -488,72 +501,18 @@ class ExhibitDialogue():
     self.timer.shutdown()
 
     # Robot should say goodbye here TODO
-    call(['bash', self.rasa_downfile])
     call(['bash', self.s2s_downfile])
+    call(['bash', self.rasa_downfile])
+
+    # Clear content of transcript file
+    self.reset_file(self.transcript_file_path)
 
     # Kill this class' screen
     self.root.quit()
     rospy.sleep(0.5)
     self.root.destroy()
 
-    # Clear content of transcript file
-    self.reset_file(self.transcript_file_path)
-
     rospy.logerr('[%s] Dialogue over. See you next time', self.pkg_name)
-
-
-  ##############################################################################
-  def let_the_games_begin(self, q):
-
-    rospy.loginfo('[%s] Starting dialogue over exhibit %s', self.pkg_name, self.exhibit_codes[q])
-
-    # Load params for this specific exhibit (`exhibit_` + self.exhibit_codes[q])
-    rospy.loginfo('[%s] Loading params', self.pkg_name)
-    self.load_exhibit_params(self.exhibit_codes[q])
-    rospy.loginfo('[%s] Done loading params', self.pkg_name)
-
-
-    # Which exhibit is this?
-    self.exhibit_codes_played.append(self.exhibit_codes[q])
-
-    # The museum's map is huge and not everytime does the initial pose get
-    # loaded. Set it here.
-    if len(self.exhibit_codes_played) == 1:
-
-      # Read start pose ...
-      current_pose = rospy.get_param('~start_pose', '')
-
-      # ... transform it into a message ...
-      pose_msg = self.make_pose_msg(current_pose)
-
-      # ... and publish it to /initialpose
-      self.amcl_init_pose_pub.publish(pose_msg)
-
-      rospy.sleep(1.0)
-
-      # Do various motions to align the pose estimate to the actual pose
-      self.move_to_calibrate_initialpose(2)
-
-
-    # The parameters have been set, but we are at the end of an exhibit dialogue
-    if len(self.exhibit_codes_played) > 1 and \
-        self.exhibit_codes_played[-1] != self.exhibit_codes_played[-2]:
-      self.goal_pose = rospy.get_param('~start_pose', '')
-
-      if self.goal_pose == '':
-        rospy.logerr('[%s] goal_pose for exhibit %s not set; aborting', \
-            self.pkg_name, self.exhibit_codes[q])
-        self.kill_root()
-      else:
-        self.goto_goal_pose()
-
-    # Play this specific exhibit. This function blocks.
-    #oe = one_exhibit.OneExhibit()
-
-    rospy.logerr('[%s] Dialogue over exhibit %s over', self.pkg_name, self.exhibit_codes[q])
-
-    # This game is over. Would you care to get to know another one?
-    #self.main_screen()
 
 
   ##############################################################################
@@ -845,14 +804,25 @@ class ExhibitDialogue():
     # Update hash value of transcript
     self.ssp.update(self.sha256sum(transcript))
 
+    # Read robot speech duration file
+    with open(self.robot_speech_duration_file_path,'r') as f:
+      rsdt = f.readlines()
+
+    if len(rsdt) > 0:
+      duration_str = ''.join(rsdt)
+      self.rdp.update(self.sha256sum(duration_str))
+      robot_speech_duration = float(duration_str)
+
+      rsd_changed = not self.rdp.equality()
+
+      if rsd_changed :
+        self.simulate_addressing(robot_speech_duration)
+
     # Determine who's talking or if the robot is simply waiting (listening)
     robot_lsening = transcript.find(self.R_) != -1
     robot_talking = transcript.find(self.R) != -1 and not robot_lsening
     human_lsening = transcript.find(self.H_) != -1
     human_talking = transcript.find(self.H) != -1 and not human_lsening
-
-    rospy.logerr('%s', transcript)
-
 
 
     # No one is talking. DON'T `return`: the human can only be heard when the
@@ -877,7 +847,6 @@ class ExhibitDialogue():
       self.tsp.update(self.H)
       transcript = transcript.replace(self.H+ ' ','')
 
-    self.tsp.printf()
 
     # Update (perhaps) the transcript
     self.transcript = transcript
@@ -900,7 +869,6 @@ class ExhibitDialogue():
 
     # The talker has changed ---------------------------------------------------
     if talker_changed:
-      rospy.logwarn('talker_changed')
 
       if robot_lsening :
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
@@ -914,6 +882,7 @@ class ExhibitDialogue():
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
+
 
       if human_lsening :
         self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
@@ -931,7 +900,6 @@ class ExhibitDialogue():
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
-
 
 
 
@@ -960,6 +928,64 @@ class ExhibitDialogue():
     h  = hashlib.sha256()
     h.update(in_string)
     return h.hexdigest()
+
+
+  ##############################################################################
+  def simulate_addressing(self, robot_speech_duration):
+
+    # Total turning angle
+    ta = 0.5
+
+    # Desired turning duration in sec = nmsg * fst
+    nmsg = 4;
+    fst = 0.25;
+    assert(nmsg*fst == 1.0)
+
+    # Sleep time between turning crossings
+    st = 1.0
+
+    # This is the total time for one complete addressing
+    # (four turns: right, left twice, right)
+    total_addressing_time = 4 * nmsg * fst + 2*st
+
+    # If the total time that the robot speaks is robot_speech_duration then
+    # find out how many complete addressings (1 addressing = 4 turns) you can
+    # fit into it. Should be integer
+    num_iterations = (int) (robot_speech_duration // total_addressing_time)
+
+    #rospy.logerr('robot_speech_duration  = %f', robot_speech_duration )
+    #rospy.logwarn('total addressing time is %f', total_addressing_time)
+    #rospy.logwarn('therefore i can spin %d times', num_iterations)
+
+    l = Vector3(0,0,0)
+    ap = Vector3(0,0,+ta)
+    an = Vector3(0,0,-ta)
+    twist_msg_ss_p = Twist(l,ap)
+    twist_msg_ss_n = Twist(l,an)
+
+    for j in range(num_iterations):
+
+      # Counterclockwise ---------------------------------------------------------
+      for i in range(nmsg):
+        self.raw_velocity_commands_pub.publish(twist_msg_ss_n)
+        rospy.sleep(fst)
+
+      # Clockwise twice ----------------------------------------------------------
+      rospy.sleep(st)
+      for i in range(nmsg):
+        self.raw_velocity_commands_pub.publish(twist_msg_ss_p)
+        rospy.sleep(fst)
+      for i in range(nmsg):
+        self.raw_velocity_commands_pub.publish(twist_msg_ss_p)
+        rospy.sleep(fst)
+
+      # Counterclockwise ---------------------------------------------------------
+      rospy.sleep(st)
+      for i in range(nmsg):
+        self.raw_velocity_commands_pub.publish(twist_msg_ss_n)
+        rospy.sleep(fst)
+
+
 
 
 ################################################################################
