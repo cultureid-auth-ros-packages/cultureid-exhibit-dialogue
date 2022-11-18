@@ -478,6 +478,9 @@ class ExhibitDialogue():
   ##############################################################################
   def kill_root(self):
 
+    # Show "killing, please wait"
+    self.display_message('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ')
+
     # Stop processing speech, I don't want any more callbacks
     self.rtf_lock == True
 
