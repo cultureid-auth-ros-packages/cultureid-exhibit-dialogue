@@ -82,7 +82,7 @@ class ExhibitDialogueMain():
     # START BUTTONS ------------------------------------------------------------
     QButton = Tkinter.Button(self.frame_,text='???',fg='#E0B548',bg='white')
     q_button_vec.append(QButton)
-    q_button_txt.append('ΕΙΣΑΓΕΤΕ ΤΟ ΟΝΟΜΑ ΤΟΥ ΕΚΘΕΜΑΤΟΣ')
+    q_button_txt.append('ΣΕ ΠΟΙΟ ΕΚΘΕΜΑ ΒΡΙΣΚΟΜΑΙ?')
 
     QButton = Tkinter.Button(self.frame_,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.process_exhibit_pressed,0))
     q_button_vec.append(QButton)

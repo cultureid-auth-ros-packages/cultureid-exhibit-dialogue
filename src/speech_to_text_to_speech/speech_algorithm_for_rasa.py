@@ -191,8 +191,6 @@ def listen_print_loop(responses,stream,transcript_write_file):
 
         transcript = alternative.transcript
 
-        # Write transcript to file
-        write_file('[HUMAN] ' + transcript, transcript_write_file)
 
         if DEBUG:
             print('THIS IS THE TRANSCRIPT')
@@ -206,11 +204,17 @@ def listen_print_loop(responses,stream,transcript_write_file):
             sys.stdout.write(transcript + overwrite_chars + "\r")
             sys.stdout.flush()
             num_chars_printed = len(transcript)
+
+            # Write transcript to file; human not finished yet
+            write_file('[HUMAN] ' + transcript, transcript_write_file)
         else:
             if DEBUG:
                 print(transcript + overwrite_chars)
 
             num_chars_printed = 0
+
+            # Write transcript to file; human finished
+            write_file('[HUMAN] ' + transcript + ' [/HUMAN]', transcript_write_file)
             return transcript, confidence
 
 

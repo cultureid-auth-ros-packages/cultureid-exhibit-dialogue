@@ -448,6 +448,7 @@ class ExhibitDialogue():
     self.R = '[ROBOT]'
     self.R_ = '[/ROBOT]'
     self.H = '[HUMAN]'
+    self.H_ = '[/HUMAN]'
 
     # init transcript
     self.transcript = ''
@@ -844,7 +845,11 @@ class ExhibitDialogue():
     # Determine who's talking or if the robot is simply waiting (listening)
     robot_lsening = transcript.find(self.R_) != -1
     robot_talking = transcript.find(self.R) != -1 and not robot_lsening
-    human_talking = transcript.find(self.H) != -1
+    human_lsening = transcript.find(self.H_) != -1
+    human_talking = transcript.find(self.H) != -1 and not human_lsening
+
+    rospy.logerr('%s', transcript)
+
 
 
     # No one is talking. DON'T `return`: the human can only be heard when the
@@ -861,10 +866,15 @@ class ExhibitDialogue():
     elif robot_talking :
       self.tsp.update(self.R)
       transcript = transcript.replace(self.R+' ','')
+    elif human_lsening :
+      self.tsp.update(self.H_)
+      transcript = transcript.replace(self.H+ ' ','')
+      transcript = transcript.replace(' '+self.H_,'')
     elif human_talking :
       self.tsp.update(self.H)
       transcript = transcript.replace(self.H+ ' ','')
 
+    self.tsp.printf()
 
     # Update (perhaps) the transcript
     self.transcript = transcript
@@ -887,19 +897,29 @@ class ExhibitDialogue():
 
     # The talker has changed ---------------------------------------------------
     if talker_changed:
+      rospy.logwarn('talker_changed')
 
       if robot_lsening :
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
 
-      if robot_talking:
+      if robot_talking :
         self.a_button_vec[0].config(font=("Helvetica", 24))
         self.a_button_vec[0].config(fg='#E0B548')
         self.a_button_vec[0].update()
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
+
+      if human_lsening :
+        self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
+        self.a_button_vec[0].config(fg='#FFFFFF')
+        self.a_button_vec[0].update()
+        self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
+        self.q_button_vec[0].config(image=self.photo)
+        self.q_button_vec[0].update()
+        time.sleep(2.0)
 
       if human_talking :
         self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
