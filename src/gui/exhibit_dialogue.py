@@ -70,6 +70,10 @@ class ExhibitDialogue():
     self.root = Tkinter.Tk()
     self.root.attributes('-fullscreen',True)
 
+    # new canvas
+    canvas = self.new_canvas()
+    self.set_canvas(canvas)
+
     # Load params for this class
     self.init_params()
 
@@ -160,7 +164,7 @@ class ExhibitDialogue():
     buttonVec = []
     buttonText = []
 
-    this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='red',activeforeground='#E0B548',activebackground='#343A40', command=self.kill_root)
+    this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='red',activeforeground='#E0B548',activebackground='#343A40', command=self.restart)
 
 
     buttonVec.append(this_butt)
@@ -269,11 +273,8 @@ class ExhibitDialogue():
     if do_init_params:
       self.init_params()
 
-    # new canvas
-    canvas = self.new_canvas()
-    self.set_canvas(canvas)
 
-      # to frame panw sto opoio 8a einai ta koumpia
+    # to frame panw sto opoio 8a einai ta koumpia
     frame = self.new_frame()
     self.set_frame(frame)
 
@@ -504,6 +505,7 @@ class ExhibitDialogue():
     call(['bash', self.s2s_downfile])
     call(['bash', self.rasa_downfile])
 
+
     # Clear content of transcript file
     self.reset_file(self.transcript_file_path)
 
@@ -671,7 +673,7 @@ class ExhibitDialogue():
         counter = counter+1
 
 
-    # Init rasa and google stuff
+    # Init google speech stuff
     call(['bash', self.s2s_upfile])
 
     # We may now begin processing
@@ -788,6 +790,8 @@ class ExhibitDialogue():
   #                                                   or the subtitle)
   def read_transcript_file(self, event=None):
 
+    rospy.loginfo('TIMER CALLBACK IN')
+
     # Do nothing if current function is currently being executed
     # (timer read may be arbitrarily large)
     if self.rtf_lock == False :
@@ -901,10 +905,27 @@ class ExhibitDialogue():
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
 
-
-
     # Release resource
     self.rtf_lock == False
+
+
+  ##############################################################################
+  def restart(self):
+    # Show "killing, please wait"
+    self.display_message('ΚΑΛΗ ΣΥΝΕΧΕΙΑ\nΑΝ ΜΕ ΧΡΕΙΑΣΤΕΙΣ ΓΙΑ ΟΠΟΙΑΔΗΠΟΤΕ ΠΛΗΡΟΦΟΡΙΑ ΞΕΡΕΙΣ ΠΟΥ ΘΑ ΜΕ ΒΡΕΙΣ')
+
+    # Stop processing speech, I don't want any more callbacks
+    self.rtf_lock == True
+
+    # Robot should say goodbye here TODO
+    call(['bash', self.s2s_downfile])
+    call(['bash', '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/scripts/rasa_restart.sh'])
+
+    # Clear content of transcript file
+    self.reset_file(self.transcript_file_path)
+
+    # Here we go again (Same old shit, dog, just a different day)
+    self.init(True)
 
 
   ##############################################################################

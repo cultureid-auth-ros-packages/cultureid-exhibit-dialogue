@@ -121,4 +121,5 @@ if __name__ == '__main__':
 
   transcript_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/transcript.txt'
   speech_time_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/speech_time.txt'
+
   s = S2S(transcript_file, speech_time_file)
