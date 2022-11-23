@@ -790,8 +790,6 @@ class ExhibitDialogue():
   #                                                   or the subtitle)
   def read_transcript_file(self, event=None):
 
-    rospy.loginfo('TIMER CALLBACK IN')
-
     # Do nothing if current function is currently being executed
     # (timer read may be arbitrarily large)
     if self.rtf_lock == False :
@@ -887,6 +885,9 @@ class ExhibitDialogue():
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
 
+        if self.robot_intent_is_s2s_shutdown():
+          self.restart()
+
 
       if human_lsening :
         self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
@@ -926,6 +927,17 @@ class ExhibitDialogue():
 
     # Here we go again (Same old shit, dog, just a different day)
     self.init(True)
+
+
+  ##############################################################################
+  def robot_intent_is_s2s_shutdown(self):
+
+    # Read the transcript. If the robot says "Καλή συνέχεια" within the
+    # text then restart rasa and goto init
+    if self.transcript.find("Καλή συνέχεια") != -1:
+      return True
+    else:
+      return False
 
 
   ##############################################################################
