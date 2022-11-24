@@ -84,14 +84,10 @@ class ExhibitDialogueMain():
     q_button_vec.append(QButton)
     q_button_txt.append('ΣΕ ΠΟΙΟ ΕΚΘΕΜΑ ΒΡΙΣΚΟΜΑΙ?')
 
-    QButton = Tkinter.Button(self.frame_,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.process_exhibit_pressed,0))
-    q_button_vec.append(QButton)
-    q_button_txt.append('ΧΡΥΣΟΣ ΤΩΝ ΜΑΚΕΔΟΝΩΝ')
-
-    QButton = Tkinter.Button(self.frame_,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.process_exhibit_pressed,1))
-    q_button_vec.append(QButton)
-    q_button_txt.append('ΠΑΠΥΡΟΣ ΤΟΥ ΔΕΡΒΕΝΙΟΥ')
-
+    for i in range(len(self.exhibit_titles)):
+      QButton = Tkinter.Button(self.frame_,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.process_exhibit_pressed,i))
+      q_button_vec.append(QButton)
+      q_button_txt.append(self.exhibit_titles[i])
 
 
     xNum = 1
@@ -184,6 +180,9 @@ class ExhibitDialogueMain():
     self.pkg_ap = rospy.get_param('~pkg_ap', '')
     self.exhibit_titles = rospy.get_param('~exhibit_titles', '')
     self.exhibit_codes = rospy.get_param('~exhibit_codes', '')
+    self.exhibit_rasa_upfile = rospy.get_param('~exhibit_rasa_upfile', '')
+    self.exhibit_rasa_downfile = rospy.get_param('~exhibit_rasa_downfile', '')
+    self.exhibit_rasa_restartfile = rospy.get_param('~exhibit_rasa_restartfile', '')
     self.listening_imagefile = rospy.get_param('~listening_imagefile', '')
     self.speaking_imagefile = rospy.get_param('~speaking_imagefile', '')
     self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
@@ -192,8 +191,9 @@ class ExhibitDialogueMain():
     self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
     self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
     self.robot_speech_duration_file_path = rospy.get_param('~speech_duration_file_path', '')
-    self.rasa_upfile = rospy.get_param('~rasa_upfile', '')
-    self.rasa_downfile = rospy.get_param('~rasa_downfile', '')
+
+    self.scripts_dir = rospy.get_param('~scripts_dir', '')
+
     self.s2s_upfile = rospy.get_param('~s2s_upfile', '')
     self.s2s_downfile = rospy.get_param('~s2s_downfile', '')
 
@@ -246,11 +246,18 @@ class ExhibitDialogueMain():
       rospy.logerr('[%s] robot_speech_duration_file_path  not set; aborting', self.pkg_name)
       return
 
-    if self.rasa_upfile== '':
-      rospy.logerr('[%s] rasa_upfile not set; aborting', self.pkg_name)
+    if self.scripts_dir == '':
+      rospy.logerr('[%s] scripts_dir not set; aborting', self.pkg_name)
       return
-    if self.rasa_downfile== '':
-      rospy.logerr('[%s] rasa_downfile not set; aborting', self.pkg_name)
+
+    if self.exhibit_rasa_upfile == '':
+      rospy.logerr('[%s] exhibit_rasa_upfile not set; aborting', self.pkg_name)
+      return
+    if self.exhibit_rasa_downfile == '':
+      rospy.logerr('[%s] exhibit_rasa_downfile not set; aborting', self.pkg_name)
+      return
+    if self.exhibit_rasa_restartfile == '':
+      rospy.logerr('[%s] exhibit_rasa_restartfile not set; aborting', self.pkg_name)
       return
     if self.s2s_upfile== '':
       rospy.logerr('[%s] s2s_upfile not set; aborting', self.pkg_name)
@@ -353,10 +360,10 @@ class ExhibitDialogueMain():
   def process_exhibit_pressed(self, exhibit_id):
 
     # Init rasa stuff
-    call(['bash', self.rasa_upfile])
+    call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_upfile[exhibit_id]])
 
     # should have arg exhibit_id for different rasa models (depending on exhibit)
-    ed = exhibit_dialogue.ExhibitDialogue()
+    ed = exhibit_dialogue.ExhibitDialogue(exhibit_id)
 
     # play again?
     self.choose_exhibit_screen()

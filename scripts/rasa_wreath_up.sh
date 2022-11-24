@@ -23,5 +23,4 @@ fi
 
 # Execute docker and redirect output to `rasa_output_file`
 echo '[BASH cultureid_exhibit_dialogue] FIRING UP RASA'
-#docker-compose -f /home/cultureid_user0/rasa-container/docker-compose.yml up --build> $rasa_output_file 2>&1 &
-docker-compose -f /home/cultureid_user0/rasa-container/docker-compose.yml up > $rasa_output_file 2>&1 &
+docker-compose -f /home/cultureid_user0/rasa-container/rasa-container-wreath/docker-compose.yml up > $rasa_output_file 2>&1 &

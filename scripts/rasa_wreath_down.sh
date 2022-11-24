@@ -14,6 +14,6 @@ echo '[BASH cultureid_exhibit_dialogue] removing rasa output file:' $rasa_output
 rm $rasa_output_file
 
 echo 'HOSING DOWN RASA'
-docker-compose -f /home/cultureid_user0/rasa-container/docker-compose.yml down
+docker-compose -f /home/cultureid_user0/rasa-container/rasa-container-wreath/docker-compose.yml down
 
 echo '[BASH cultureid_exhibit_dialogue] RASA IS DEAD'

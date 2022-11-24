@@ -1,16 +1,20 @@
 <launch>
 
   <!-- The name of this package -->
-  <arg name="pkg_name" default="cultureid_exhibit_dialogue" />
+  <arg name="pkg_name"      default="cultureid_exhibit_dialogue" />
 
   <!-- The absolute path of this package -->
-  <arg name="pkg_ap"   default="$(eval find(arg ('pkg_name')))" />
+  <arg name="pkg_ap"        default="$(eval find(arg ('pkg_name')))" />
+
+  <!-- bash scripts directory -->
+  <arg name="scripts_dir"   default="$(arg pkg_ap)/scripts" />
 
 
   <node name="cultureid_exhibit_dialogue_gui_node" pkg="cultureid_exhibit_dialogue" type="main.py" output="screen">
 
     <param name="pkg_name"                    value="$(arg pkg_name)" />
     <param name="pkg_ap"                      value="$(arg pkg_ap)" />
+    <param name="scripts_dir"                 value="$(arg scripts_dir)" />
     <param name="navigation_warnfile"         value="$(arg pkg_ap)/gui_resources/navigation/move_bitch.mp3" />
     <param name="navigation_audiofile"        value="$(arg pkg_ap)/gui_resources/navigation/p1_to_p2.mp3" />
     <param name="navigation_imagefile"        value="$(arg pkg_ap)/gui_resources/navigation/danger.png" />
@@ -21,10 +25,8 @@
     <param name="transcript_file_readrate"    value="10.0" />
     <param name="speech_duration_file_path"   value="$(arg pkg_ap)/transcripts/speech_time.txt" />
 
-    <param name="rasa_upfile"                 value="$(arg pkg_ap)/scripts/rasa_up.sh" />
-    <param name="rasa_downfile"               value="$(arg pkg_ap)/scripts/rasa_down.sh" />
-    <param name="s2s_upfile"                  value="$(arg pkg_ap)/scripts/s2s_up.sh" />
-    <param name="s2s_downfile"                value="$(arg pkg_ap)/scripts/s2s_down.sh" />
+    <param name="s2s_upfile"                  value="$(arg scripts_dir)/s2s_up.sh" />
+    <param name="s2s_downfile"                value="$(arg scripts_dir)/s2s_down.sh" />
 
     <rosparam command="load"                  file="$(arg pkg_ap)/config/exhibits.yaml" />
     <rosparam command="load"                  file="$(arg pkg_ap)/config/to_load.yaml" />

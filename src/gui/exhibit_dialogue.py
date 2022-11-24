@@ -65,7 +65,7 @@ class ExhibitDialogue():
   ##############################################################################
   # constructor
   ##############################################################################
-  def __init__(self):
+  def __init__(self, exhibit_id):
 
     self.root = Tkinter.Tk()
     self.root.attributes('-fullscreen',True)
@@ -73,6 +73,9 @@ class ExhibitDialogue():
     # new canvas
     canvas = self.new_canvas()
     self.set_canvas(canvas)
+
+    # set exhibit id
+    self.exhibit_id = exhibit_id
 
     # Load params for this class
     self.init_params()
@@ -386,8 +389,9 @@ class ExhibitDialogue():
     self.transcript_file_path = rospy.get_param('~transcript_file_path', '')
     self.transcript_file_readrate = rospy.get_param('~transcript_file_readrate', '')
     self.robot_speech_duration_file_path = rospy.get_param('~speech_duration_file_path', '')
-    self.rasa_upfile = rospy.get_param('~rasa_upfile', '')
-    self.rasa_downfile = rospy.get_param('~rasa_downfile', '')
+    self.scripts_dir = rospy.get_param('~scripts_dir', '')
+    self.exhibit_rasa_downfile = rospy.get_param('~exhibit_rasa_downfile', '')
+    self.exhibit_rasa_restartfile = rospy.get_param('~exhibit_rasa_restartfile', '')
     self.s2s_upfile = rospy.get_param('~s2s_upfile', '')
     self.s2s_downfile = rospy.get_param('~s2s_downfile', '')
 
@@ -440,11 +444,14 @@ class ExhibitDialogue():
       rospy.logerr('[%s] robot_speech_duration_file_path not set; aborting', self.pkg_name)
       return
 
-    if self.rasa_upfile== '':
-      rospy.logerr('[%s] rasa_upfile not set; aborting', self.pkg_name)
+    if self.scripts_dir == '':
+      rospy.logerr('[%s] scripts_dir not set; aborting', self.pkg_name)
       return
-    if self.rasa_downfile== '':
-      rospy.logerr('[%s] rasa_downfile not set; aborting', self.pkg_name)
+    if self.exhibit_rasa_downfile== '':
+      rospy.logerr('[%s] exhibit_rasa_downfile not set; aborting', self.pkg_name)
+      return
+    if self.exhibit_rasa_restartfile== '':
+      rospy.logerr('[%s] exhibit_rasa_restartfile not set; aborting', self.pkg_name)
       return
     if self.s2s_upfile== '':
       rospy.logerr('[%s] s2s_upfile not set; aborting', self.pkg_name)
@@ -503,7 +510,7 @@ class ExhibitDialogue():
 
     # Robot should say goodbye here TODO
     call(['bash', self.s2s_downfile])
-    call(['bash', self.rasa_downfile])
+    call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_downfile[self.exhibit_id]])
 
 
     # Clear content of transcript file
@@ -827,6 +834,7 @@ class ExhibitDialogue():
     human_talking = transcript.find(self.H) != -1 and not human_lsening
 
 
+
     # No one is talking. DON'T `return`: the human can only be heard when the
     # robot isn't speaking, but she is not necessarily talking (the listening
     # image shall be displayed when the robot is not speaking)
@@ -858,6 +866,14 @@ class ExhibitDialogue():
     talker_changed = not self.tsp.equality()
     transc_changed = not self.ssp.equality()
 
+    rospy.logwarn('--------------------------------------')
+    rospy.logwarn("robot talking = %d", robot_talking)
+    rospy.logwarn("robot lsening = %d", robot_lsening)
+    rospy.logwarn("human talking = %d", human_talking)
+    rospy.logwarn("human lsening = %d", human_lsening)
+    rospy.logwarn("talker changed = %d", talker_changed)
+    rospy.logwarn("transc changed = %d", transc_changed)
+
 
     # The transcript has changed -----------------------------------------------
     if transc_changed:
@@ -887,6 +903,7 @@ class ExhibitDialogue():
 
         if self.robot_intent_is_s2s_shutdown():
           self.restart()
+          return
 
 
       if human_lsening :
@@ -920,7 +937,7 @@ class ExhibitDialogue():
 
     # Robot should say goodbye here TODO
     call(['bash', self.s2s_downfile])
-    call(['bash', '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/scripts/rasa_restart.sh'])
+    call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile])
 
     # Clear content of transcript file
     self.reset_file(self.transcript_file_path)
