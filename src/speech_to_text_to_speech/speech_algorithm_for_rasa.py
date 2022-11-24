@@ -275,7 +275,7 @@ def speech_to_text(transcript_write_file):
 
             if stream.time_over:
 
-                transcript = "πιο σύντομα παρακαλώ"
+                transcript = "Πιο σύντομα παρακαλώ."
                 flag = False
 
                 if DEBUG:
@@ -294,7 +294,7 @@ def speech_to_text(transcript_write_file):
             else:
 
                 if confidence < 0.75:
-                    transcript = "δεν κατάλαβα, παρακαλώ επανάλαβε πιο καθαρά αυτή τη φορά"
+                    transcript = "Δεν κατάλαβα, παρακαλώ επανάλαβε πιο καθαρά αυτή τη φορά."
                     flag = False
 
                     if DEBUG:

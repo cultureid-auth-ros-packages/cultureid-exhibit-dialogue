@@ -866,13 +866,13 @@ class ExhibitDialogue():
     talker_changed = not self.tsp.equality()
     transc_changed = not self.ssp.equality()
 
-    rospy.logwarn('--------------------------------------')
-    rospy.logwarn("robot talking = %d", robot_talking)
-    rospy.logwarn("robot lsening = %d", robot_lsening)
-    rospy.logwarn("human talking = %d", human_talking)
-    rospy.logwarn("human lsening = %d", human_lsening)
-    rospy.logwarn("talker changed = %d", talker_changed)
-    rospy.logwarn("transc changed = %d", transc_changed)
+#    rospy.logwarn('--------------------------------------')
+    #rospy.logwarn("robot talking = %d", robot_talking)
+    #rospy.logwarn("robot lsening = %d", robot_lsening)
+    #rospy.logwarn("human talking = %d", human_talking)
+    #rospy.logwarn("human lsening = %d", human_lsening)
+    #rospy.logwarn("talker changed = %d", talker_changed)
+    #rospy.logwarn("transc changed = %d", transc_changed)
 
 
     # The transcript has changed -----------------------------------------------

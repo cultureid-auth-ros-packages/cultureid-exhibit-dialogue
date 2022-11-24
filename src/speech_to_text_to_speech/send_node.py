@@ -67,7 +67,7 @@ class S2S():
 
     #------------------------- Robot has the initiative ------------------------
     #------------------- and speaks first because human is shy -----------------
-
+    # This is a one-time only deal ---------------------------------------------
     while True:
       try:
         response = self.funcc("γειά")
@@ -98,7 +98,25 @@ class S2S():
       #if self.human_speech_text_ == "έξοδος":
         #break
 
-      response = self.funcc(self.human_speech_text_)
+      print('--------------------TASOS-----------------------')
+      print(self.human_speech_text_)
+
+
+      if flag == True:
+        response = self.funcc(self.human_speech_text_)
+      else:
+        self.robot_speech_text_ = message
+
+        # Write transcript of voice to transcript file
+        self.write_file('[ROBOT] ' + self.robot_speech_text_, self.transcript_file_)
+
+        # Speak text; blocks until all words are spoken
+        text_to_speech(self.robot_speech_text_, self.robot_speech_time_file_)
+
+        # Signify end of speech
+        self.reset_file(self.transcript_file_)
+        self.write_file('[ROBOT] ' + self.robot_speech_text_ + ' [/ROBOT]', self.transcript_file_)
+
 
 
   ##############################################################################
