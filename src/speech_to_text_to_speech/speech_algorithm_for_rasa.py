@@ -293,7 +293,7 @@ def speech_to_text(transcript_write_file):
 
             else:
 
-                if confidence < 0.75:
+                if confidence < 0.3:
                     transcript = "Δεν κατάλαβα, παρακαλώ επανάλαβε πιο καθαρά αυτή τη φορά."
                     flag = False
 

@@ -1,5 +1,5 @@
-exhibit_titles: ['Πάπυρος του Δερβενίου', 'Χρυσό στεφάνι μυρτιάς', 'Γεωμετρία']
+exhibit_titles: ['Πάπυρος του Δερβενίου', 'Χρυσό στεφάνι μυρτιάς', 'Κρατήρας του Δερβανίου']
 exhibit_codes: ['a', 'b', 'c']
-exhibit_rasa_upfile: ['rasa_papyrus_up.sh', 'rasa_wreath_up.sh', 'rasa_placeholder_up.sh']
-exhibit_rasa_downfile: ['rasa_papyrus_down.sh', 'rasa_wreath_down.sh', 'rasa_placeholder_down.sh']
+exhibit_rasa_upfile: ['rasa_papyrus_up.sh', 'rasa_wreath_up.sh', 'rasa_crater_up.sh']
+exhibit_rasa_downfile: ['rasa_papyrus_down.sh', 'rasa_wreath_down.sh', 'rasa_crater_down.sh']
 exhibit_rasa_restartfile: 'rasa_restart.sh'
