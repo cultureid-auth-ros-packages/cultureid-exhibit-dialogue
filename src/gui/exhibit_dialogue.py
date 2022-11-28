@@ -155,6 +155,7 @@ class ExhibitDialogue():
         thisWidth = buttonVec[counter].winfo_width()
         thisHeight = buttonVec[counter].winfo_height()
         buttonVec[counter].config(font=("Helvetica", 20))
+        buttonVec[counter].config(wraplength=thisWidth-40,justify="center")
         buttonVec[counter].update()
 
         counter = counter+1
@@ -178,7 +179,7 @@ class ExhibitDialogue():
     yNum = 1
 
     xEff = 0.075
-    yEff = 0.075
+    yEff = 0.1
 
     GP = 0.175
 
@@ -834,28 +835,25 @@ class ExhibitDialogue():
     human_talking = transcript.find(self.H) != -1 and not human_lsening
 
 
-
-    # No one is talking. DON'T `return`: the human can only be heard when the
-    # robot isn't speaking, but she is not necessarily talking (the listening
-    # image shall be displayed when the robot is not speaking)
-    #if robot_talking == human_talking:
-      #rospy.logwarn('[%s] No speech whatsoever from any side', self.pkg_name)
-
     # Queue current talker
     if robot_lsening :
       self.tsp.update(self.R_)
       transcript = transcript.replace(self.R+' ','')
       transcript = transcript.replace(' '+self.R_,'')
+      #rospy.logwarn('ROBOT IS LISTENING')
     elif robot_talking :
       self.tsp.update(self.R)
       transcript = transcript.replace(self.R+' ','')
+      #rospy.logwarn('ROBOT IS TALKING')
     elif human_lsening :
       self.tsp.update(self.H_)
       transcript = transcript.replace(self.H+ ' ','')
       transcript = transcript.replace(' '+self.H_,'')
+      #rospy.logwarn('HUMAN IS LISTENING')
     elif human_talking :
       self.tsp.update(self.H)
       transcript = transcript.replace(self.H+ ' ','')
+      #rospy.logwarn('HUMAN IS TALKING')
 
 
     # Update (perhaps) the transcript
@@ -866,7 +864,7 @@ class ExhibitDialogue():
     talker_changed = not self.tsp.equality()
     transc_changed = not self.ssp.equality()
 
-#    rospy.logwarn('--------------------------------------')
+    #rospy.logwarn('--------------------------------------')
     #rospy.logwarn("robot talking = %d", robot_talking)
     #rospy.logwarn("robot lsening = %d", robot_lsening)
     #rospy.logwarn("human talking = %d", human_talking)
@@ -874,15 +872,37 @@ class ExhibitDialogue():
     #rospy.logwarn("talker changed = %d", talker_changed)
     #rospy.logwarn("transc changed = %d", transc_changed)
 
+    # Modify font size according to transcript size (the show-what-is-being-said button
+    # has fixed width)
+    base_font = tkFont.Font(family='Helvetica', size=30)
+    actual_font = copy.copy(base_font)
+    bw = self.a_button_vec[0].winfo_width()*2
+
+    while actual_font.measure(self.transcript) > bw:
+      current_size = actual_font.cget('size')
+      new_size = current_size-1
+      actual_font.config(size=new_size)
+
 
     # The transcript has changed -----------------------------------------------
     if transc_changed:
-
       self.a_button_txt[0] = self.transcript
       self.a_button_vec[0].config(text=self.a_button_txt[0])
       self.a_button_vec[0].config(\
           wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
       self.a_button_vec[0].update()
+
+    if human_talking or human_lsening:
+      self.a_button_vec[0].config(font=("Helvetica", actual_font.cget('size'), "italic"))
+      self.a_button_vec[0].config(fg='#FFFFFF')
+      self.a_button_vec[0].update()
+
+    if robot_talking :
+      self.a_button_vec[0].config(font=("Helvetica", actual_font.cget('size')))
+      self.a_button_vec[0].config(fg='#E0B548')
+      self.a_button_vec[0].update()
+
+
 
 
     # The talker has changed ---------------------------------------------------
@@ -894,9 +914,6 @@ class ExhibitDialogue():
         self.q_button_vec[0].update()
 
       if robot_talking :
-        self.a_button_vec[0].config(font=("Helvetica", 24))
-        self.a_button_vec[0].config(fg='#E0B548')
-        self.a_button_vec[0].update()
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.speaking_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
@@ -907,18 +924,12 @@ class ExhibitDialogue():
 
 
       if human_lsening :
-        self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
-        self.a_button_vec[0].config(fg='#FFFFFF')
-        self.a_button_vec[0].update()
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
-        time.sleep(2.0)
+        time.sleep(0.2)
 
       if human_talking :
-        self.a_button_vec[0].config(font=("Helvetica", 24, "italic"))
-        self.a_button_vec[0].config(fg='#FFFFFF')
-        self.a_button_vec[0].update()
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()

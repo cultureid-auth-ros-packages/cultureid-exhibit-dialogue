@@ -98,8 +98,8 @@ class S2S():
       #if self.human_speech_text_ == "έξοδος":
         #break
 
-      print('--------------------TASOS-----------------------')
-      print(self.human_speech_text_)
+      #print('--------------------TASOS-----------------------')
+      #print(self.human_speech_text_)
 
 
       if flag == True:
