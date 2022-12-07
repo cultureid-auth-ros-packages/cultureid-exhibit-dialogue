@@ -236,7 +236,7 @@ def speech_to_text(transcript_write_file):
     language_code = "el-GR"  # a BCP-47 language tag
 
     SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
-    cred = service_account.Credentials.from_service_account_file('solid-scope-361216-f63934ecc11d.json', scopes=SCOPES)
+    cred = service_account.Credentials.from_service_account_file('indytherobot-9e663be7d21d.json', scopes=SCOPES)
 
     client = speech.SpeechClient(credentials=cred)
 
@@ -293,7 +293,7 @@ def speech_to_text(transcript_write_file):
 
             else:
 
-                if confidence < 0.75:
+                if confidence < 0.3:
                     transcript = "Δεν κατάλαβα, παρακαλώ επανάλαβε πιο καθαρά αυτή τη φορά."
                     flag = False
 
@@ -320,7 +320,7 @@ def speech_to_text(transcript_write_file):
 def text_to_speech(text,time_file):
 
     SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
-    cred = service_account.Credentials.from_service_account_file('solid-scope-361216-f63934ecc11d.json', scopes=SCOPES)
+    cred = service_account.Credentials.from_service_account_file('indytherobot-9e663be7d21d.json', scopes=SCOPES)
 
     client=texttospeech.TextToSpeechClient(credentials=cred)
 
