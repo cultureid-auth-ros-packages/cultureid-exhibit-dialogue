@@ -1,4 +1,4 @@
-exhibit_titles: ['Πάπυρος του Δερβενίου', 'Χρυσό στεφάνι μυρτιάς', 'Κρατήρας του Δερβανίου']
+exhibit_titles: ['Πάπυρος του Δερβενίου', 'Χρυσό στεφάνι μυρτιάς', 'Κρατήρας του Δερβενίου']
 exhibit_codes: ['a', 'b', 'c']
 exhibit_rasa_upfile: ['rasa_papyrus_up.sh', 'rasa_wreath_up.sh', 'rasa_crater_up.sh']
 exhibit_rasa_downfile: ['rasa_papyrus_down.sh', 'rasa_wreath_down.sh', 'rasa_crater_down.sh']
