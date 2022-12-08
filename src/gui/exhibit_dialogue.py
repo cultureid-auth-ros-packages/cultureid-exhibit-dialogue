@@ -284,13 +284,16 @@ class ExhibitDialogue():
 
 
     # START BUTTON -------------------------------------------------------------
-    QButton = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=self.main_screen)
+    QButton_el = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.main_screen, 'el'))
+    QButton_en = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.main_screen, 'en'))
     q_button_vec = []
-    q_button_vec.append(QButton)
+    q_button_vec.append(QButton_el)
+    q_button_vec.append(QButton_en)
 
     # The text of the question
     q_button_txt = []
     q_button_txt.append('ΕΚΚΙΝΗΣΗ')
+    q_button_txt.append('START')
 
     xNum = len(q_button_vec)
     yNum = 1
@@ -298,7 +301,7 @@ class ExhibitDialogue():
 
     xEff = 1.0
     yEff = 0.7
-    GP = 0.1
+    GP = 0.05
 
     xWithGuard = xEff/xNum
     xG = GP*xWithGuard
@@ -336,7 +339,7 @@ class ExhibitDialogue():
     a_button_vec.append(this_butt)
 
     a_button_txt = []
-    a_button_txt.append('ΕΞΟΔΟΣ')
+    a_button_txt.append('ΕΞΟΔΟΣ / EXIT')
 
     xNum,yNum = self.get_x_y_dims(len(a_button_vec))
 
@@ -583,7 +586,7 @@ class ExhibitDialogue():
 
 
   ##############################################################################
-  def main_screen(self):
+  def main_screen(self, locale):
 
     # new canvas
     canvas = self.new_canvas()
@@ -603,7 +606,11 @@ class ExhibitDialogue():
     self.q_button_vec.append(QButton)
 
     # The text of the question
-    self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
+    if locale == 'el':
+      self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
+
+    if locale == 'en':
+      self.q_button_txt.append('PLEASE BE PATIENT\nI AM ATTEMPTING TO WAKE UP')
 
     xNum = len(self.q_button_vec)
     yNum = 1
@@ -642,7 +649,11 @@ class ExhibitDialogue():
 
 
     # Show A -------------------------------------------------------------------
-    self.a_button_txt.append('ΕΔΩ ΘΑ ΣΑΣ ΔΕΙΧΝΩ ΤΙ ΛΕΩ ΚΑΙ ΤΙ ΝΟΜΙΖΩ ΟΤΙ ΛΕΤΕ ΕΣΕΙΣ')
+    if locale == 'el':
+      self.a_button_txt.append('ΕΔΩ ΘΑ ΣΑΣ ΔΕΙΧΝΩ ΤΙ ΛΕΩ ΚΑΙ ΤΙ ΝΟΜΙΖΩ ΟΤΙ ΕΙΠΑΤΕ ΕΣΕΙΣ')
+    if locale == 'en':
+      self.a_button_txt.append('THIS IS WHERE YOU WILL BE SHOWN WHAT I SAY AND WHAT I THINK YOU SAID')
+
     this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40')
     self.a_button_vec.append(this_butt)
 
