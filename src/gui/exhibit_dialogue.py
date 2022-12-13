@@ -914,7 +914,13 @@ class ExhibitDialogue():
     # has fixed width)
     base_font = tkFont.Font(family='Helvetica', size=30)
     actual_font = copy.copy(base_font)
-    bw = self.a_button_vec[0].winfo_width()*2
+
+    # Sometimes the exit button has been pressed and there is no window to get
+    # its width; hence the program hangs. Alleviate this by trying
+    try:
+      bw = self.a_button_vec[0].winfo_width()*2
+    except Exception as e:
+      return
 
     while actual_font.measure(self.transcript) > bw:
       current_size = actual_font.cget('size')
