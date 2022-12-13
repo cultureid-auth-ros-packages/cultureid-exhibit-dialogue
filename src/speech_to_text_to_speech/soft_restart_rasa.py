@@ -9,12 +9,13 @@ from play_sound import *
 
 
 ##############################################################################
-def funcc(msg):
+def funcc(msg, rasa_port):
 
   headers = {'Content-type': 'application/json',}
   dct = {"sender": "tester", "message": msg}
   data = json.dumps(dct, indent=True)
-  response = requests.post('http://localhost:5005/webhooks/rest/webhook', headers=headers, data=data)
+  url = 'http://localhost:' + rasa_port + '/webhooks/rest/webhook'
+  response = requests.post(url, headers=headers, data=data)
 
   if response_ok(response):
 
@@ -51,10 +52,12 @@ def response_ok(response):
 ################################################################################
 if __name__ == '__main__':
 
+  rasa_port = sys.argv[1]
+
   while True:
     try:
       print('[cultureid-exhibit-dialogue; s2s] rasa restart requested ...')
-      response = funcc("επαναφορά σλοτ")
+      response = funcc("επαναφορά σλοτ", rasa_port)
 
       if response_ok(response):
         print('[cultureid-exhibit-dialogue; s2s] ... rasa will restart')

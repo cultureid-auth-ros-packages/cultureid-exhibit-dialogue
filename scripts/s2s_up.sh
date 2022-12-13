@@ -40,4 +40,7 @@ echo '[BASH cultureid_exhibit_dialogue] executing S2S'
 
 # S2S cannot exist without rasa. S2S may now be executed
 roscd cultureid_exhibit_dialogue/src/speech_to_text_to_speech
-python3 send_node.py &
+
+# The first and only argument should be the port of the rasa server
+# (different ports for different, concurrently-running, languages)
+python3 send_node.py $1 &

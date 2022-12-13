@@ -28,6 +28,9 @@
     <param name="s2s_upfile"                  value="$(arg scripts_dir)/s2s_up.sh" />
     <param name="s2s_downfile"                value="$(arg scripts_dir)/s2s_down.sh" />
 
+    <param name="rasa_port_el"                value="5005" />
+    <param name="rasa_port_en"                value="5006" />
+
     <rosparam command="load"                  file="$(arg pkg_ap)/config/exhibits.yaml" />
     <rosparam command="load"                  file="$(arg pkg_ap)/config/to_load.yaml" />
 

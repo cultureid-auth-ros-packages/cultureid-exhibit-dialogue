@@ -398,6 +398,8 @@ class ExhibitDialogue():
     self.exhibit_rasa_restartfile = rospy.get_param('~exhibit_rasa_restartfile', '')
     self.s2s_upfile = rospy.get_param('~s2s_upfile', '')
     self.s2s_downfile = rospy.get_param('~s2s_downfile', '')
+    self.rasa_port_el = rospy.get_param('~rasa_port_el','')
+    self.rasa_port_en = rospy.get_param('~rasa_port_en','')
 
 
     if self.pkg_name == '':
@@ -462,6 +464,12 @@ class ExhibitDialogue():
       return
     if self.s2s_downfile== '':
       rospy.logerr('[%s] s2s_downfile not set; aborting', self.pkg_name)
+      return
+    if self.rasa_port_el == '':
+      rospy.logerr('[%s] rasa_port_el not set; aborting', self.pkg_name)
+      return
+    if self.rasa_port_en == '':
+      rospy.logerr('[%s] rasa_port_en not set; aborting', self.pkg_name)
       return
 
     # Talkers' identifiers
@@ -586,7 +594,7 @@ class ExhibitDialogue():
 
 
   ##############################################################################
-  def main_screen(self, locale):
+  def main_screen(self, lang):
 
     # new canvas
     canvas = self.new_canvas()
@@ -600,16 +608,18 @@ class ExhibitDialogue():
     # All the choices for this question
     #choices = self.exhibit_titles
 
+    self.current_lang = lang
+
 
     # Show Q -------------------------------------------------------------------
     QButton = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548')
     self.q_button_vec.append(QButton)
 
     # The text of the question
-    if locale == 'el':
+    if self.current_lang == 'el':
       self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
 
-    if locale == 'en':
+    if self.current_lang == 'en':
       self.q_button_txt.append('PLEASE BE PATIENT\nI AM ATTEMPTING TO WAKE UP')
 
     xNum = len(self.q_button_vec)
@@ -649,9 +659,9 @@ class ExhibitDialogue():
 
 
     # Show A -------------------------------------------------------------------
-    if locale == 'el':
+    if self.current_lang == 'el':
       self.a_button_txt.append('ΕΔΩ ΘΑ ΣΑΣ ΔΕΙΧΝΩ ΤΙ ΛΕΩ ΚΑΙ ΤΙ ΝΟΜΙΖΩ ΟΤΙ ΕΙΠΑΤΕ ΕΣΕΙΣ')
-    if locale == 'en':
+    if self.current_lang == 'en':
       self.a_button_txt.append('THIS IS WHERE YOU WILL BE SHOWN WHAT I SAY AND WHAT I THINK YOU SAID')
 
     this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40')
@@ -692,8 +702,12 @@ class ExhibitDialogue():
         counter = counter+1
 
 
-    # Init google speech stuff
-    call(['bash', self.s2s_upfile])
+    # Init google speech stuff depending on language
+    if self.current_lang == 'el':
+      call(['bash', self.s2s_upfile, str(self.rasa_port_el)])
+
+    if self.current_lang == 'en':
+      call(['bash', self.s2s_upfile, str(self.rasa_port_en)])
 
     # We may now begin processing
     self.rtf_lock = False
@@ -959,7 +973,11 @@ class ExhibitDialogue():
 
     # Robot should say goodbye here TODO
     call(['bash', self.s2s_downfile])
-    call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile])
+
+    if self.current_lang == 'el':
+      call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, str(self.rasa_port_el)])
+    if self.current_lang == 'en':
+      call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, str(self.rasa_port_en)])
 
     # Clear content of transcript file
     self.reset_file(self.transcript_file_path)

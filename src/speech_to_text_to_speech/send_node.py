@@ -12,7 +12,7 @@ class S2S():
   ##############################################################################
   # constructor
   ##############################################################################
-  def __init__(self, transcript_file, robot_speech_time_file):
+  def __init__(self, transcript_file, robot_speech_time_file, port):
 
     # Transcript of robot speech
     self.robot_speech_text_ = ''
@@ -26,8 +26,12 @@ class S2S():
     # Write the duration of each robot speech into a file
     self.robot_speech_time_file_ = robot_speech_time_file
 
+    # rasa port
+    self.rasa_port = port
+
     # This is the meat
     self.talk_to_bot_via_rest()
+
 
 
   ##############################################################################
@@ -36,7 +40,8 @@ class S2S():
     headers = {'Content-type': 'application/json',}
     dct = {"sender": "tester", "message": msg}
     data = json.dumps(dct, indent=True)
-    response = requests.post('http://localhost:5005/webhooks/rest/webhook', headers=headers, data=data)
+    url = 'http://localhost:' + self.rasa_port + '/webhooks/rest/webhook'
+    response = requests.post(url, headers=headers, data=data)
 
     if (response.status_code == 200) and (response.headers["content-type"].strip().startswith("application/json")):
 
@@ -140,4 +145,6 @@ if __name__ == '__main__':
   transcript_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/transcript.txt'
   speech_time_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/speech_time.txt'
 
-  s = S2S(transcript_file, speech_time_file)
+  rasa_port = sys.argv[1]
+
+  s = S2S(transcript_file, speech_time_file, rasa_port)
