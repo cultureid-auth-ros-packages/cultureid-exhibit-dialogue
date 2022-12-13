@@ -9,7 +9,7 @@ from play_sound import *
 
 
 ##############################################################################
-def funcc(msg, rasa_port):
+def funcc(msg, rasa_lang, rasa_port):
 
   headers = {'Content-type': 'application/json',}
   dct = {"sender": "tester", "message": msg}
@@ -30,7 +30,7 @@ def funcc(msg, rasa_port):
       speech_time_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/speech_time.txt'
 
       # Speak text; blocks until all words are spoken
-      text_to_speech(text, speech_time_file)
+      text_to_speech(text, speech_time_file,rasa_lang)
 
   return response
 
@@ -52,12 +52,13 @@ def response_ok(response):
 ################################################################################
 if __name__ == '__main__':
 
-  rasa_port = sys.argv[1]
+  rasa_lang = sys.argv[1]
+  rasa_port = sys.argv[2]
 
   while True:
     try:
       print('[cultureid-exhibit-dialogue; s2s] rasa restart requested ...')
-      response = funcc("επαναφορά σλοτ", rasa_port)
+      response = funcc("επαναφορά σλοτ", rasa_lang, rasa_port)
 
       if response_ok(response):
         print('[cultureid-exhibit-dialogue; s2s] ... rasa will restart')

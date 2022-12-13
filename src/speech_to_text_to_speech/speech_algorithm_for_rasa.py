@@ -225,15 +225,13 @@ def listen_print_loop(responses,stream,transcript_write_file):
 
 
 #-------------------------------------------------------------------------------
-def speech_to_text(transcript_write_file):
+def speech_to_text(transcript_write_file, language_code):
 
     # Audio recording parameters
     rate = RESPEAKER_RATE
     chunk =  CHUNK #int(rate / 10)  # 100ms
-    duration = 5
+    duration = 10
 
-
-    language_code = "el-GR"  # a BCP-47 language tag
 
     SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
     cred = service_account.Credentials.from_service_account_file('indytherobot-9e663be7d21d.json', scopes=SCOPES)
@@ -317,7 +315,7 @@ def speech_to_text(transcript_write_file):
 
 
 #-------------------------------------------------------------------------------
-def text_to_speech(text,time_file):
+def text_to_speech(text,time_file,language_code):
 
     SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
     cred = service_account.Credentials.from_service_account_file('indytherobot-9e663be7d21d.json', scopes=SCOPES)
@@ -325,26 +323,23 @@ def text_to_speech(text,time_file):
     client=texttospeech.TextToSpeechClient(credentials=cred)
 
 
-    #output of: print(client.list_voices())
-    #voices {
-      #language_codes: "el-GR"
-      #name: "el-GR-Wavenet-A"
-      #ssml_gender: FEMALE
-      #natural_sample_rate_hertz: 24000
-    #}
-    #voices {
-      #language_codes: "el-GR"
-      #name: "el-GR-Standard-A"
-      #ssml_gender: FEMALE
-      #natural_sample_rate_hertz: 24000
-    #}
+
+    # Available voice models
+    # https://cloud.google.com/text-to-speech/docs/voices
+    lname = ''
+    if language_code == 'el-GR':
+      lname = 'el-GR-Wavenet-A'
+    elif language_code == 'en-GB':
+      lname = 'en-GB-Neural2-C'
+    else:
+      lname = language_code + '-Standard-A'
 
     input=texttospeech.types.SynthesisInput(text=text)
 
     voice = texttospeech.types.VoiceSelectionParams(
-        language_code='el-GR',
+        language_code=language_code,
         ssml_gender=texttospeech.enums.SsmlVoiceGender.FEMALE,
-        name='el-GR-Wavenet-A' # Better than el-GR-Standard-A
+        name=lname
     )
 
 

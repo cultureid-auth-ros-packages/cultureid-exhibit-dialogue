@@ -12,7 +12,7 @@ class S2S():
   ##############################################################################
   # constructor
   ##############################################################################
-  def __init__(self, transcript_file, robot_speech_time_file, port):
+  def __init__(self, transcript_file, robot_speech_time_file, lang, port):
 
     # Transcript of robot speech
     self.robot_speech_text_ = ''
@@ -25,6 +25,9 @@ class S2S():
 
     # Write the duration of each robot speech into a file
     self.robot_speech_time_file_ = robot_speech_time_file
+
+    # rasa language
+    self.rasa_lang = lang
 
     # rasa port
     self.rasa_port = port
@@ -58,7 +61,7 @@ class S2S():
         self.write_file('[ROBOT] ' + self.robot_speech_text_, self.transcript_file_)
 
         # Speak text; blocks until all words are spoken
-        text_to_speech(self.robot_speech_text_, self.robot_speech_time_file_)
+        text_to_speech(self.robot_speech_text_, self.robot_speech_time_file_, self.rasa_lang)
 
         # Signify end of speech
         self.reset_file(self.transcript_file_)
@@ -90,7 +93,7 @@ class S2S():
     while True:
 
       try:
-        message, flag = speech_to_text(self.transcript_file_)
+        message, flag = speech_to_text(self.transcript_file_, self.rasa_lang)
         self.human_speech_text_ = message
         reset_file(self.transcript_file_)
 
@@ -116,7 +119,7 @@ class S2S():
         self.write_file('[ROBOT] ' + self.robot_speech_text_, self.transcript_file_)
 
         # Speak text; blocks until all words are spoken
-        text_to_speech(self.robot_speech_text_, self.robot_speech_time_file_)
+        text_to_speech(self.robot_speech_text_, self.robot_speech_time_file_, self.rasa_lang)
 
         # Signify end of speech
         self.reset_file(self.transcript_file_)
@@ -145,6 +148,7 @@ if __name__ == '__main__':
   transcript_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/transcript.txt'
   speech_time_file = '/home/cultureid_user0/catkin_ws/src/cultureid-exhibit-dialogue/transcripts/speech_time.txt'
 
-  rasa_port = sys.argv[1]
+  rasa_lang = sys.argv[1]
+  rasa_port = sys.argv[2]
 
-  s = S2S(transcript_file, speech_time_file, rasa_port)
+  s = S2S(transcript_file, speech_time_file, rasa_lang, rasa_port)

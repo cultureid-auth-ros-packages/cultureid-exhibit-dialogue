@@ -240,7 +240,11 @@ class ExhibitDialogue():
     cc_sleep_time = 5.0
 
     # Clear and come with me
-    self.display_message('ΠΑΡΑΚΑΛΩ ΑΠΟΜΑΚΡΥΝΘΕΙΤΕ')
+    if self.current_lang == self.el:
+      self.display_message('ΠΑΡΑΚΑΛΩ ΑΠΟΜΑΚΡΥΝΘΕΙΤΕ')
+    if self.current_lang == self.en:
+      self.display_message('PLEASE GIVE ME SPACE')
+
     call(['cvlc', '--no-repeat', '--play-and-exit', self.navigation_warnfile])
     rospy.loginfo('Waiting for %f sec before I clear costmaps', cc_sleep_time)
     rospy.sleep(cc_sleep_time)
@@ -255,7 +259,10 @@ class ExhibitDialogue():
 
     rospy.loginfo('Waiting for %f sec after I clear costmaps', cc_sleep_time)
     rospy.sleep(cc_sleep_time)
-    self.display_message('ΠΑΡΑΚΑΛΩ ΕΛΑΤΕ ΜΑΖΙ ΜΟΥ')
+    if self.current_lang == self.el:
+      self.display_message('ΠΑΡΑΚΑΛΩ ΕΛΑΤΕ ΜΑΖΙ ΜΟΥ')
+    if self.current_lang == self.en:
+      self.display_message('PLEASE FOLLOW ME')
 
     rospy.loginfo('[%s] Sending goal and waiting for result', self.pkg_name)
     self.action_client.send_goal(goal_msg)
@@ -274,6 +281,9 @@ class ExhibitDialogue():
   def init(self, do_init_params):
     rospy.logwarn('init')
 
+    self.el = 'el-GR'
+    self.en = 'en-GB'
+
     if do_init_params:
       self.init_params()
 
@@ -284,8 +294,8 @@ class ExhibitDialogue():
 
 
     # START BUTTON -------------------------------------------------------------
-    QButton_el = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.main_screen, 'el'))
-    QButton_en = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.main_screen, 'en'))
+    QButton_el = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.main_screen, self.el))
+    QButton_en = Tkinter.Button(frame,text='???',fg='white',bg='#E0B548',activeforeground='white',activebackground='#E0B548', command=partial(self.main_screen, self.en))
     q_button_vec = []
     q_button_vec.append(QButton_el)
     q_button_vec.append(QButton_en)
@@ -493,10 +503,10 @@ class ExhibitDialogue():
     self.a_button_vec = []
     self.a_button_txt = []
 
-    # Talking Sequence Pair: [0] for current talker, [1] for previous
+    # Talking Sequence Pair:       [0] for current talker, [1] for previous
     self.tsp = pair(None,None)
 
-    # Sha256 Sequence Pair:  [0] for current sha,    [1] for previous
+    # Sha256 Sequence Pair:        [0] for current sha,    [1] for previous
     self.ssp = pair(0,0)
 
     # Sha256 robot duration Pair:  [0] for current sha,    [1] for previous
@@ -512,7 +522,10 @@ class ExhibitDialogue():
   def kill_root(self):
 
     # Show "killing, please wait"
-    self.display_message('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ')
+    if self.current_lang == self.el:
+      self.display_message('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ')
+    if self.current_lang == self.en:
+      self.display_message('PLEASE BE PATIENT')
 
     # Stop processing speech, I don't want any more callbacks
     self.rtf_lock == True
@@ -616,10 +629,10 @@ class ExhibitDialogue():
     self.q_button_vec.append(QButton)
 
     # The text of the question
-    if self.current_lang == 'el':
+    if self.current_lang == self.el:
       self.q_button_txt.append('ΠΑΡΑΚΑΛΩ ΑΝΑΜΕΙΝΑΤΕ\nΠΡΟΣΠΑΘΩ ΝΑ ΞΥΠΝΗΣΩ')
 
-    if self.current_lang == 'en':
+    if self.current_lang == self.en:
       self.q_button_txt.append('PLEASE BE PATIENT\nI AM ATTEMPTING TO WAKE UP')
 
     xNum = len(self.q_button_vec)
@@ -659,9 +672,9 @@ class ExhibitDialogue():
 
 
     # Show A -------------------------------------------------------------------
-    if self.current_lang == 'el':
+    if self.current_lang == self.el:
       self.a_button_txt.append('ΕΔΩ ΘΑ ΣΑΣ ΔΕΙΧΝΩ ΤΙ ΛΕΩ ΚΑΙ ΤΙ ΝΟΜΙΖΩ ΟΤΙ ΕΙΠΑΤΕ ΕΣΕΙΣ')
-    if self.current_lang == 'en':
+    if self.current_lang == self.en:
       self.a_button_txt.append('THIS IS WHERE YOU WILL BE SHOWN WHAT I SAY AND WHAT I THINK YOU SAID')
 
     this_butt = Tkinter.Button(frame,text='???',fg='#E0B548',bg='#343A40',activeforeground='#E0B548',activebackground='#343A40')
@@ -703,11 +716,11 @@ class ExhibitDialogue():
 
 
     # Init google speech stuff depending on language
-    if self.current_lang == 'el':
-      call(['bash', self.s2s_upfile, str(self.rasa_port_el)])
+    if self.current_lang == self.el:
+      call(['bash', self.s2s_upfile, self.current_lang, str(self.rasa_port_el)])
 
-    if self.current_lang == 'en':
-      call(['bash', self.s2s_upfile, str(self.rasa_port_en)])
+    if self.current_lang == self.en:
+      call(['bash', self.s2s_upfile, self.current_lang, str(self.rasa_port_en)])
 
     # We may now begin processing
     self.rtf_lock = False
@@ -965,19 +978,23 @@ class ExhibitDialogue():
 
   ##############################################################################
   def restart(self):
+
     # Show "killing, please wait"
-    self.display_message('ΚΑΛΗ ΣΥΝΕΧΕΙΑ\nΑΝ ΜΕ ΧΡΕΙΑΣΤΕΙΣ ΓΙΑ ΟΠΟΙΑΔΗΠΟΤΕ ΠΛΗΡΟΦΟΡΙΑ ΞΕΡΕΙΣ ΠΟΥ ΘΑ ΜΕ ΒΡΕΙΣ')
+    if self.current_lang == self.el:
+      self.display_message('ΚΑΛΗ ΣΥΝΕΧΕΙΑ\nΑΝ ΜΕ ΧΡΕΙΑΣΤΕΙΣ ΓΙΑ ΟΠΟΙΑΔΗΠΟΤΕ ΠΛΗΡΟΦΟΡΙΑ ΞΕΡΕΙΣ ΠΟΥ ΘΑ ΜΕ ΒΡΕΙΣ')
+
+    if self.current_lang == self.en:
+      self.display_message('HAVE A NICE DAY\nSHOULD YOU NEED ME FOR ANY INFORMATION, YOU KNOW WHERE TO FIND ME')
 
     # Stop processing speech, I don't want any more callbacks
     self.rtf_lock == True
 
     # Robot should say goodbye here TODO
     call(['bash', self.s2s_downfile])
-
-    if self.current_lang == 'el':
-      call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, str(self.rasa_port_el)])
-    if self.current_lang == 'en':
-      call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, str(self.rasa_port_en)])
+    if self.current_lang == self.el:
+      call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, self.el, str(self.rasa_port_el)])
+    if self.current_lang == self.en:
+      call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, self.en, str(self.rasa_port_en)])
 
     # Clear content of transcript file
     self.reset_file(self.transcript_file_path)
