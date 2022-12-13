@@ -28,6 +28,10 @@
     <param name="s2s_upfile"                  value="$(arg scripts_dir)/s2s_up.sh" />
     <param name="s2s_downfile"                value="$(arg scripts_dir)/s2s_down.sh" />
 
+    <!-- Check docker-compose.yml files in directories
+         $WHEREVER/rasa-container/rasa-container-*-* (e.g. rasa-container-papyrus-el);
+        all rasa servers should be at port 5005 for dialogue in greek and
+                                           5006 for english -->
     <param name="rasa_port_el"                value="5005" />
     <param name="rasa_port_en"                value="5006" />
 
