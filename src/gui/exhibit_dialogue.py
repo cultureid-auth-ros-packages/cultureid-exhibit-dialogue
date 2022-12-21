@@ -300,17 +300,22 @@ class ExhibitDialogue():
     q_button_vec.append(QButton_el)
     q_button_vec.append(QButton_en)
 
+    self.photo_el = Tkinter.PhotoImage(master = self.canvas_, file = self.el_GR_flag)
+    self.photo_en = Tkinter.PhotoImage(master = self.canvas_, file = self.en_GB_flag)
+
     # The text of the question
-    q_button_txt = []
-    q_button_txt.append('ΕΚΚΙΝΗΣΗ')
-    q_button_txt.append('START')
+    #q_button_txt = []
+    #q_button_txt.append('ΕΚΚΙΝΗΣΗ')
+    #q_button_txt.append('START')
+
+
 
     xNum = len(q_button_vec)
     yNum = 1
 
 
     xEff = 1.0
-    yEff = 0.7
+    yEff = 0.5
     GP = 0.05
 
     xWithGuard = xEff/xNum
@@ -328,13 +333,19 @@ class ExhibitDialogue():
         thisY = yG/2+yy*yWithGuard+0.1
 
         q_button_vec[counter].place(relx=thisX,rely=thisY,relheight=yB,relwidth=xB)
-        q_button_vec[counter].config(text=q_button_txt[counter])
+        #q_button_vec[counter].config(text=q_button_txt[counter])
         q_button_vec[counter].update()
 
         thisWidth = q_button_vec[counter].winfo_width()
         thisHeight = q_button_vec[counter].winfo_height()
 
         q_button_vec[counter].config(font=("Helvetica", 30))
+
+        if counter == 0:
+          q_button_vec[counter].config(image=self.photo_el)
+        if counter == 1:
+          q_button_vec[counter].config(image=self.photo_en)
+
         q_button_vec[counter].update()
 
         counter = counter+1
@@ -354,7 +365,7 @@ class ExhibitDialogue():
     xNum,yNum = self.get_x_y_dims(len(a_button_vec))
 
     xEff = 1.0
-    yEff = 0.2
+    yEff = 0.4
     GP = 0.1
 
     xWithGuard = xEff/xNum
@@ -397,6 +408,8 @@ class ExhibitDialogue():
     self.exhibit_codes = rospy.get_param('~exhibit_codes', '')
     self.listening_imagefile = rospy.get_param('~listening_imagefile', '')
     self.speaking_imagefile = rospy.get_param('~speaking_imagefile', '')
+    self.el_GR_flag = rospy.get_param('~el_GR_flag', '')
+    self.en_GB_flag = rospy.get_param('~en_GB_flag', '')
     self.navigation_warnfile = rospy.get_param('~navigation_warnfile', '')
     self.navigation_audiofile = rospy.get_param('~navigation_audiofile', '')
     self.navigation_imagefile = rospy.get_param('~navigation_imagefile', '')
@@ -434,6 +447,14 @@ class ExhibitDialogue():
 
     if self.speaking_imagefile == '':
       rospy.logerr('[%s] speaking_imagefile not set; aborting', self.pkg_name)
+      return
+
+    if self.el_GR_flag == '':
+      rospy.logerr('[%s] el_GR_flag not set; aborting', self.pkg_name)
+      return
+
+    if self.en_GB_flag == '':
+      rospy.logerr('[%s] en_GB_flag not set; aborting', self.pkg_name)
       return
 
     if self.navigation_warnfile == '':
@@ -640,7 +661,7 @@ class ExhibitDialogue():
 
 
     xEff = 1.0
-    yEff = 0.7
+    yEff = 0.5
     GP = 0.1
 
     xWithGuard = xEff/xNum
@@ -683,7 +704,7 @@ class ExhibitDialogue():
     xNum,yNum = self.get_x_y_dims(len(self.a_button_vec))
 
     xEff = 1.0
-    yEff = 0.2
+    yEff = 0.4
     GP = 0.1
 
     xWithGuard = xEff/xNum
@@ -918,7 +939,7 @@ class ExhibitDialogue():
     # Sometimes the exit button has been pressed and there is no window to get
     # its width; hence the program hangs. Alleviate this by trying
     try:
-      bw = self.a_button_vec[0].winfo_width()*2
+      bw = self.a_button_vec[0].winfo_width()*3
     except Exception as e:
       return
 
@@ -936,7 +957,7 @@ class ExhibitDialogue():
           wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
       self.a_button_vec[0].update()
 
-    if human_talking or human_lsening:
+    if human_talking or human_lsening or robot_lsening :
       self.a_button_vec[0].config(font=("Helvetica", actual_font.cget('size'), "italic"))
       self.a_button_vec[0].config(fg='#FFFFFF')
       self.a_button_vec[0].update()
@@ -950,7 +971,7 @@ class ExhibitDialogue():
 
 
     # The talker has changed ---------------------------------------------------
-    if talker_changed:
+    if talker_changed :
 
       if robot_lsening :
         self.photo = Tkinter.PhotoImage(master = self.canvas_, file = self.listening_imagefile)
@@ -995,7 +1016,6 @@ class ExhibitDialogue():
     # Stop processing speech, I don't want any more callbacks
     self.rtf_lock == True
 
-    # Robot should say goodbye here TODO
     call(['bash', self.s2s_downfile])
     if self.current_lang == self.el:
       call(['bash', self.scripts_dir + "/" + self.exhibit_rasa_restartfile, self.el, str(self.rasa_port_el)])
@@ -1015,6 +1035,10 @@ class ExhibitDialogue():
     # Read the transcript. If the robot says "Καλή συνέχεια" within the
     # text then restart rasa and goto init
     if self.transcript.find("Καλή συνέχεια") != -1:
+      return True
+    elif self.transcript.find("a nice day") != -1:
+      return True
+    elif self.transcript.find("Enjoy your visit") != -1:
       return True
     else:
       return False

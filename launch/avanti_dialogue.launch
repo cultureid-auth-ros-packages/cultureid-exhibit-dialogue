@@ -20,6 +20,8 @@
     <param name="navigation_imagefile"        value="$(arg pkg_ap)/gui_resources/navigation/danger.png" />
     <param name="listening_imagefile"         value="$(arg pkg_ap)/gui_resources/interaction/robot_listening.png" />
     <param name="speaking_imagefile"          value="$(arg pkg_ap)/gui_resources/interaction/robot_speaking.png" />
+    <param name="el_GR_flag"                  value="$(arg pkg_ap)/gui_resources/languages/el-GR.png" />
+    <param name="en_GB_flag"                  value="$(arg pkg_ap)/gui_resources/languages/en-GB.png" />
 
     <param name="transcript_file_path"        value="$(arg pkg_ap)/transcripts/transcript.txt" />
     <param name="transcript_file_readrate"    value="10.0" />

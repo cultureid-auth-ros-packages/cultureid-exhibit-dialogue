@@ -58,7 +58,12 @@ if __name__ == '__main__':
   while True:
     try:
       print('[cultureid-exhibit-dialogue; s2s] rasa restart requested ...')
-      response = funcc("επαναφορά σλοτ", rasa_lang, rasa_port)
+
+      if rasa_lang == 'el-GR':
+        response = funcc("επαναφορά σλοτ", rasa_lang, rasa_port)
+
+      if rasa_lang == 'en-GB':
+        response = funcc("reset slot", rasa_lang, rasa_port)
 
       if response_ok(response):
         print('[cultureid-exhibit-dialogue; s2s] ... rasa will restart')

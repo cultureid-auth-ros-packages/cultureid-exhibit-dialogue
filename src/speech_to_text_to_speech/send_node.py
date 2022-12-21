@@ -48,7 +48,10 @@ class S2S():
 
     if (response.status_code == 200) and (response.headers["content-type"].strip().startswith("application/json")):
 
-      my_json = response.content.decode('utf8').replace("'", '"')
+      if self.rasa_lang == 'el-GR':
+        my_json = response.content.decode('utf8').replace("'", '"')
+      if self.rasa_lang == 'en-GB':
+        my_json = response.content.decode('utf8')
 
       # Load the JSON to a Python list & dump it back out as formatted JSON
       data = json.loads(my_json)
@@ -78,7 +81,10 @@ class S2S():
     # This is a one-time only deal ---------------------------------------------
     while True:
       try:
-        response = self.funcc("γειά")
+        if self.rasa_lang == 'el-GR':
+          response = self.funcc("γειά")
+        if self.rasa_lang == 'en-GB':
+          response = self.funcc("hi")
 
         if (response.status_code == 200) and (response.headers["content-type"].strip().startswith("application/json")):
           break
@@ -97,17 +103,12 @@ class S2S():
         self.human_speech_text_ = message
         reset_file(self.transcript_file_)
 
-        #print('HUMAN')
-        #print(self.human_speech_text_)
       except:
         print("[cultureid-exhibit-dialogue; s2s] exception thrown while listening to human; pathetic")
         continue
 
       #if self.human_speech_text_ == "έξοδος":
         #break
-
-      #print('--------------------TASOS-----------------------')
-      #print(self.human_speech_text_)
 
 
       if flag == True:

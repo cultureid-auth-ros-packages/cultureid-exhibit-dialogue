@@ -273,16 +273,24 @@ def speech_to_text(transcript_write_file, language_code):
 
             if stream.time_over:
 
-                transcript = "Πιο σύντομα παρακαλώ."
-                flag = False
+                if language_code == 'el-GR':
+                    transcript = "Παρακαλώ ομιλείστε πιο σύντομα"
+                    flag = False
+                if language_code == 'en-GB':
+                    transcript = "Speak prompter please."
+                    flag = False
 
                 if DEBUG:
                     print(transcript)
                 break
 
             elif not transcript:   #den milise katholou
-                transcript = "Σιωπή"
-                flag = True
+                if language_code == 'el-GR':
+                    transcript = "Σιωπή"
+                    flag = True
+                if language_code == 'en-GB':
+                    transcript = "Silence"
+                    flag = True
 
                 if DEBUG:
                     print("no message at all")
@@ -292,8 +300,12 @@ def speech_to_text(transcript_write_file, language_code):
             else:
 
                 if confidence < 0.3:
-                    transcript = "Δεν κατάλαβα, παρακαλώ επανάλαβε πιο καθαρά αυτή τη φορά."
-                    flag = False
+                    if language_code == 'el-GR':
+                        transcript = "Δεν κατάλαβα, παρακαλώ επανάλαβε πιο καθαρά αυτή τη φορά."
+                        flag = False
+                    if language_code == 'en-GB':
+                        transcript = "Did not understand, please repeat clearer this time."
+                        flag = False
 
                     if DEBUG:
                         print("low confidence: %f" % confidence)
@@ -345,7 +357,7 @@ def text_to_speech(text,time_file,language_code):
 
     audio_config=texttospeech.types.AudioConfig(
         audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
-        #speaking_rate=0.5,
+        speaking_rate=0.9
         #pitch=2,
         #effects_profile_id=[effects_profile_id]
 
