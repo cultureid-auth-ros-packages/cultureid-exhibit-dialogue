@@ -77,6 +77,9 @@ class ExhibitDialogue():
     # set exhibit id
     self.exhibit_id = exhibit_id
 
+    self.el = 'el-GR'
+    self.en = 'en-GB'
+
     # Load params for this class
     self.init_params()
 
@@ -281,8 +284,6 @@ class ExhibitDialogue():
   def init(self, do_init_params):
     rospy.logwarn('init')
 
-    self.el = 'el-GR'
-    self.en = 'en-GB'
 
     if do_init_params:
       self.init_params()
@@ -511,6 +512,7 @@ class ExhibitDialogue():
 
     # init transcript
     self.transcript = ''
+    self.current_lang = self.el
 
     # should not be local variable, hence here I am
     self.photo = ''
@@ -939,11 +941,20 @@ class ExhibitDialogue():
     # Sometimes the exit button has been pressed and there is no window to get
     # its width; hence the program hangs. Alleviate this by trying
     try:
-      bw = self.a_button_vec[0].winfo_width()*3
+      bw = self.a_button_vec[0].winfo_height()*self.a_button_vec[0].winfo_width()
+      print('h = ' + str(self.a_button_vec[0].winfo_height()))
+      print('w = ' + str(self.a_button_vec[0].winfo_width()))
+      print('bw = ' + str(bw))
     except Exception as e:
       return
 
-    while actual_font.measure(self.transcript) > bw:
+    print('measure   = ' + str(actual_font.measure(self.transcript)))
+    print('linespace = ' + str(actual_font.metrics("linespace")))
+    print('ml = ' + str(actual_font.metrics("linespace")*actual_font.measure(self.transcript)))
+    print (self.transcript)
+
+    while (actual_font.measure(self.transcript)+10)*(actual_font.metrics("linespace")+10) > bw:
+      print ('resizing')
       current_size = actual_font.cget('size')
       new_size = current_size-1
       actual_font.config(size=new_size)
@@ -957,7 +968,7 @@ class ExhibitDialogue():
           wraplength=self.a_button_vec[0].winfo_width()-10,justify="center")
       self.a_button_vec[0].update()
 
-    if human_talking or human_lsening or robot_lsening :
+    if human_talking or human_lsening :
       self.a_button_vec[0].config(font=("Helvetica", actual_font.cget('size'), "italic"))
       self.a_button_vec[0].config(fg='#FFFFFF')
       self.a_button_vec[0].update()
