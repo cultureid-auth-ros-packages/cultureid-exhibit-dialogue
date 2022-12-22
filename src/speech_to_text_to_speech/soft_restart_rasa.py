@@ -19,7 +19,10 @@ def funcc(msg, rasa_lang, rasa_port):
 
   if response_ok(response):
 
-    my_json = response.content.decode('utf8').replace("'", '"')
+    if rasa_lang == 'el-GR':
+      my_json = response.content.decode('utf8').replace("'", '"')
+    if rasa_lang == 'en-GB':
+      my_json = response.content.decode('utf8')
 
     # Load the JSON to a Python list & dump it back out as formatted JSON
     data = json.loads(my_json)
