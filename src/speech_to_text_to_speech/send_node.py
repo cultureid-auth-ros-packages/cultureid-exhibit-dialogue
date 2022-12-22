@@ -28,6 +28,8 @@ class S2S():
 
     # rasa language
     self.rasa_lang = lang
+    self.el = 'el-GR'
+    self.en = 'en-GB'
 
     # rasa port
     self.rasa_port = port
@@ -48,9 +50,9 @@ class S2S():
 
     if (response.status_code == 200) and (response.headers["content-type"].strip().startswith("application/json")):
 
-      if self.rasa_lang == 'el-GR':
+      if self.rasa_lang == self.el:
         my_json = response.content.decode('utf8').replace("'", '"')
-      if self.rasa_lang == 'en-GB':
+      if self.rasa_lang == self.en:
         my_json = response.content.decode('utf8')
 
       # Load the JSON to a Python list & dump it back out as formatted JSON
@@ -81,9 +83,9 @@ class S2S():
     # This is a one-time only deal ---------------------------------------------
     while True:
       try:
-        if self.rasa_lang == 'el-GR':
+        if self.rasa_lang == self.el:
           response = self.funcc("γειά")
-        if self.rasa_lang == 'en-GB':
+        if self.rasa_lang == self.en:
           response = self.funcc("hi")
 
         if (response.status_code == 200) and (response.headers["content-type"].strip().startswith("application/json")):

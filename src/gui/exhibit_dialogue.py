@@ -942,19 +942,19 @@ class ExhibitDialogue():
     # its width; hence the program hangs. Alleviate this by trying
     try:
       bw = self.a_button_vec[0].winfo_height()*self.a_button_vec[0].winfo_width()
-      print('h = ' + str(self.a_button_vec[0].winfo_height()))
-      print('w = ' + str(self.a_button_vec[0].winfo_width()))
-      print('bw = ' + str(bw))
+      #print('h = ' + str(self.a_button_vec[0].winfo_height()))
+      #print('w = ' + str(self.a_button_vec[0].winfo_width()))
+      #print('bw = ' + str(bw))
     except Exception as e:
       return
 
-    print('measure   = ' + str(actual_font.measure(self.transcript)))
-    print('linespace = ' + str(actual_font.metrics("linespace")))
-    print('ml = ' + str(actual_font.metrics("linespace")*actual_font.measure(self.transcript)))
-    print (self.transcript)
+    #print('measure   = ' + str(actual_font.measure(self.transcript)))
+    #print('linespace = ' + str(actual_font.metrics("linespace")))
+    #print('ml = ' + str(actual_font.metrics("linespace")*actual_font.measure(self.transcript)))
+    #print (self.transcript)
 
     while (actual_font.measure(self.transcript)+10)*(actual_font.metrics("linespace")+10) > bw:
-      print ('resizing')
+      #print ('resizing')
       current_size = actual_font.cget('size')
       new_size = current_size-1
       actual_font.config(size=new_size)
