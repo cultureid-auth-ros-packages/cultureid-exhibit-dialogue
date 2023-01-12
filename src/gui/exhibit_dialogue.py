@@ -978,7 +978,9 @@ class ExhibitDialogue():
       self.a_button_vec[0].config(fg='#E0B548')
       self.a_button_vec[0].update()
 
-
+    if self.robot_intent_is_s2s_shutdown():
+      self.restart()
+      return
 
 
     # The talker has changed ---------------------------------------------------
@@ -994,9 +996,7 @@ class ExhibitDialogue():
         self.q_button_vec[0].config(image=self.photo)
         self.q_button_vec[0].update()
 
-        if self.robot_intent_is_s2s_shutdown():
-          self.restart()
-          return
+
 
 
       if human_lsening :
@@ -1048,6 +1048,8 @@ class ExhibitDialogue():
     if self.transcript.find("Καλή συνέχεια") != -1:
       return True
     elif self.transcript.find("a nice day") != -1:
+      return True
+    elif self.transcript.find("goodbye") != -1:
       return True
     elif self.transcript.find("Enjoy your visit") != -1:
       return True
